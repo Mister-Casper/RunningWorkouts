@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.RunningWorkouts" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@color/dark_grey</item>
+    </style>
+
+    <style name="Theme.RunningWorkouts.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#333333</item>
+
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_inset</item>
+        <item name="windowSplashScreenAnimationDuration">500</item>
+
+        <item name="postSplashScreenTheme">@style/Theme.RunningWorkouts</item>
+    </style>
+
+</resources>

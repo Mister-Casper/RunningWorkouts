@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Running Workouts</string>
+
+    <string name="bottom_navigation_activity">Activity</string>
+    <string name="bottom_navigation_progress">Progress</string>
+    <string name="bottom_navigation_profile">Profile</string>
+</resources>
