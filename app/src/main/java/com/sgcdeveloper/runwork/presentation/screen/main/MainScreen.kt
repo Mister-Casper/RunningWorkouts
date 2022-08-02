@@ -4,7 +4,6 @@ import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.ramcosta.composedestinations.DestinationsNavHost
@@ -19,10 +18,9 @@ import com.sgcdeveloper.runwork.presentation.screen.destinations.StartScreenDest
 
 @Composable
 @Destination(start = true)
-fun MainScreen(navigator: DestinationsNavigator) {
-    val startViewModel = hiltViewModel<StartViewModel>()
+fun MainScreen(navigator: DestinationsNavigator, startViewModel: StartViewModel = hiltViewModel()) {
     val onboardingStatus =
-        startViewModel.onboardngStatus.collectAsState(initial = OnboardingStatus.None)
+        startViewModel.onboardingStatus.collectAsState(initial = OnboardingStatus.None)
 
     when (onboardingStatus.value) {
         OnboardingStatus.START -> {
