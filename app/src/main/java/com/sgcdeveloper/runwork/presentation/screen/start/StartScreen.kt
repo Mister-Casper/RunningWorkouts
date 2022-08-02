@@ -1,5 +1,7 @@
 package com.sgcdeveloper.runwork.presentation.screen.start
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
@@ -8,8 +10,10 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ramcosta.composedestinations.annotation.Destination
@@ -18,6 +22,7 @@ import com.sgcdeveloper.runwork.R
 import com.sgcdeveloper.runwork.presentation.component.FullscreenImage
 import com.sgcdeveloper.runwork.presentation.screen.destinations.LogInScreenDestination
 import com.sgcdeveloper.runwork.presentation.screen.destinations.RegistrationScreenDestination
+import com.sgcdeveloper.runwork.presentation.theme.black
 import com.sgcdeveloper.runwork.presentation.theme.dark_blue
 import com.sgcdeveloper.runwork.presentation.theme.dark_gray
 import com.sgcdeveloper.runwork.presentation.theme.white
@@ -25,7 +30,13 @@ import com.sgcdeveloper.runwork.presentation.theme.white
 @Composable
 @Destination(route = "start_screen")
 fun StartScreen(navigator: DestinationsNavigator) {
-    FullscreenImage()
+    FullscreenImage(
+        gradientColors = listOf(
+            Color.Transparent,
+            Color.Transparent,
+            black,
+        )
+    )
     Box(Modifier.fillMaxSize()) {
         Column(
             Modifier
@@ -42,7 +53,7 @@ fun StartScreen(navigator: DestinationsNavigator) {
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 12.dp, bottom = 16.dp)
+                    .padding(top = 12.dp)
             ) {
                 Text(
                     text = stringResource(R.string.start_journey),
@@ -51,22 +62,24 @@ fun StartScreen(navigator: DestinationsNavigator) {
                     fontWeight = FontWeight.ExtraBold
                 )
             }
-            Button(
-                onClick = { navigator.navigate(LogInScreenDestination) },
-                shape = RoundedCornerShape(24.dp),
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = dark_gray.copy(alpha = 0.5f),
-                    contentColor = white
-                ),
-                modifier = Modifier.fillMaxWidth()
-            ) {
+            Box(modifier = Modifier
+                .padding(start = 12.dp, end = 12.dp, top = 12.dp, bottom = 8.dp)
+                .align(Alignment.CenterHorizontally)
+                .clickable {
+                    navigator.navigate(LogInScreenDestination)
+                }) {
                 Text(
                     text = stringResource(R.string.already_have_account),
-                    modifier = Modifier.padding(top = 4.dp, bottom = 4.dp),
+                    modifier = Modifier
+                        .padding(top = 12.dp, bottom = 12.dp)
+                        .align(Alignment.Center),
                     fontSize = 14.sp,
-                    fontWeight = FontWeight.ExtraBold
+                    fontWeight = FontWeight.ExtraBold,
+                    textAlign = TextAlign.Center
                 )
             }
         }
     }
+
+    BackHandler {}
 }

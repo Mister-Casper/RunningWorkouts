@@ -1,11 +1,9 @@
 package com.sgcdeveloper.runwork.presentation.screen.logIn
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -24,11 +22,7 @@ fun LogInScreen(navigator: DestinationsNavigator) {
     FullscreenImage()
     Column(Modifier.fillMaxSize()) {
         BackButton(navigator = navigator)
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.Transparent.copy(alpha = 0.4f))
-        ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
             Text(
                 text = stringResource(id = R.string.welcome_back),
                 color = white,
