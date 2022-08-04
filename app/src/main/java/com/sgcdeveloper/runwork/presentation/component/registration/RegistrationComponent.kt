@@ -1,6 +1,7 @@
-package com.sgcdeveloper.runwork.presentation.component
+package com.sgcdeveloper.runwork.presentation.component.registration
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
@@ -16,45 +17,25 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.sgcdeveloper.runwork.R
 import com.sgcdeveloper.runwork.presentation.theme.black
 import com.sgcdeveloper.runwork.presentation.theme.white
 
 @Composable
-fun RegButtons(actionGoogle: () -> Unit = {}, actionEmail: () -> Unit = {}) {
+fun RegistrationComponent(
+    onGoogleSignInSuccessful: (account: GoogleSignInAccount) -> Unit,
+    onGoogleSignInFailed: () -> Unit,
+    actionEmail: () -> Unit = {}
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 18.dp, end = 18.dp, bottom = 32.dp)
     ) {
-        Button(
-            onClick = { },
-            shape = RoundedCornerShape(24.dp),
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = white,
-                contentColor = Color.Unspecified
-            ),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Row(Modifier.padding(bottom = 4.dp, top = 4.dp)) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_google),
-                    contentDescription = "google icon",
-                    modifier = Modifier
-                        .size(24.dp)
-                        .align(Alignment.CenterVertically)
-                )
-                Text(
-                    text = stringResource(R.string.continue_registration),
-                    modifier = Modifier
-                        .padding(start = 8.dp)
-                        .align(Alignment.CenterVertically),
-                    fontSize = 14.sp,
-                    color = black,
-                    fontWeight = FontWeight.ExtraBold
-                )
-            }
-        }
+        GoogleSignInButton(
+            onSuccessful = { account -> onGoogleSignInSuccessful(account) },
+            onFailed = { onGoogleSignInFailed() })
         Button(
             onClick = { },
             shape = RoundedCornerShape(24.dp),
@@ -80,7 +61,10 @@ fun RegButtons(actionGoogle: () -> Unit = {}, actionEmail: () -> Unit = {}) {
                     text = stringResource(R.string.email_registration),
                     modifier = Modifier
                         .padding(start = 8.dp)
-                        .align(Alignment.CenterVertically),
+                        .align(Alignment.CenterVertically)
+                        .clickable {
+                            actionEmail()
+                        },
                     fontSize = 14.sp,
                     color = white,
                     fontWeight = FontWeight.ExtraBold

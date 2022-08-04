@@ -1,4 +1,4 @@
-package com.sgcdeveloper.runwork.presentation.screen.start
+package com.sgcdeveloper.runwork.presentation.screen.onboarding.start
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
@@ -24,7 +24,6 @@ import com.sgcdeveloper.runwork.presentation.screen.destinations.LogInScreenDest
 import com.sgcdeveloper.runwork.presentation.screen.destinations.RegistrationScreenDestination
 import com.sgcdeveloper.runwork.presentation.theme.black
 import com.sgcdeveloper.runwork.presentation.theme.dark_blue
-import com.sgcdeveloper.runwork.presentation.theme.dark_gray
 import com.sgcdeveloper.runwork.presentation.theme.white
 
 @Composable

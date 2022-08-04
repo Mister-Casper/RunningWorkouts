@@ -2,6 +2,7 @@ package com.sgcdeveloper.runwork.di
 
 import android.content.Context
 import androidx.room.Room
+import com.google.firebase.auth.FirebaseAuth
 import com.sgcdeveloper.runwork.core.DefaultDispatchersProvider
 import com.sgcdeveloper.runwork.core.DispatchersProvider
 import com.sgcdeveloper.runwork.data.AppDatabase
@@ -53,5 +54,11 @@ object AppModule {
     @Provides
     fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
         return SharedPreferences(context)
+    }
+
+    @Singleton
+    @Provides
+    fun provideFirebaseAuth(@ApplicationContext context: Context): FirebaseAuth {
+        return FirebaseAuth.getInstance()
     }
 }
