@@ -1,16 +1,18 @@
 <resources>
     <string name="app_name">Running Workouts</string>
 
-    <string name="bottom_navigation_activity">Activity</string>
-    <string name="bottom_navigation_progress">Progress</string>
-    <string name="bottom_navigation_profile">Profile</string>
-    <string name="start_journey">START JOURNEY</string>
-    <string name="already_have_account">ALREADY HAVE AN ACCOUNT? LOG IN</string>
-    <string name="sign_up_any_way">Sign up any way you like and start working out.</string>
-    <string name="join_us">JOIN US</string>
-    <string name="continue_registration">CONTINUE</string>
-    <string name="email_registration">EMAIL</string>
-    <string name="welcome_back">WELCOME BACK</string>
-    <string name="log_in_to_continue">Log in with one of the following options and get started</string>
+    <string name="main__bottom_navigation_activity">Activity</string>
+    <string name="main__bottom_navigation_progress">Progress</string>
+    <string name="main__bottom_navigation_profile">Profile</string>
+
+    <string name="onboarding__registration_header">JOIN US</string>
+    <string name="onboarding__registration_description">Sign up any way you like and start working out.</string>
+    <string name="onboarding__login_header">WELCOME BACK</string>
+    <string name="onboarding__login_text">Log in with one of the following options and get started</string>
+    <string name="onboarding__registration">START JOURNEY</string>
+    <string name="onboarding__login">ALREADY HAVE AN ACCOUNT? LOG IN</string>
+    <string name="onboarding__continue_registration">CONTINUE</string>
+    <string name="onboarding__email_registration">EMAIL</string>
+    <string name="onboarding__google_auth_error">Login by Google not working</string>
 
 </resources>

@@ -45,7 +45,7 @@ enum class BottomBarDestination(
     @DrawableRes val icon: Int,
     @StringRes val label: Int
 ) {
-    Progress(ProgressScreenDestination, R.drawable.icon_progress, R.string.bottom_navigation_progress),
-    Activity(ActivityScreenDestination, R.drawable.icon_activity, R.string.bottom_navigation_activity),
-    Profile(ProfileScreenDestination, R.drawable.icon_profile, R.string.bottom_navigation_profile)
+    Progress(ProgressScreenDestination, R.drawable.icon_progress, R.string.main__bottom_navigation_progress),
+    Activity(ActivityScreenDestination, R.drawable.icon_activity, R.string.main__bottom_navigation_activity),
+    Profile(ProfileScreenDestination, R.drawable.icon_profile, R.string.main__bottom_navigation_profile)
 }

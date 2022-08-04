@@ -27,7 +27,7 @@ import com.sgcdeveloper.runwork.presentation.theme.dark_blue
 import com.sgcdeveloper.runwork.presentation.theme.white
 
 @Composable
-@Destination(route = "start_screen")
+@Destination
 fun StartScreen(navigator: DestinationsNavigator) {
     FullscreenImage(
         gradientColors = listOf(
@@ -55,7 +55,7 @@ fun StartScreen(navigator: DestinationsNavigator) {
                     .padding(top = 12.dp)
             ) {
                 Text(
-                    text = stringResource(R.string.start_journey),
+                    text = stringResource(R.string.onboarding__registration_header),
                     modifier = Modifier.padding(top = 6.dp, bottom = 6.dp),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.ExtraBold
@@ -68,7 +68,7 @@ fun StartScreen(navigator: DestinationsNavigator) {
                     navigator.navigate(LogInScreenDestination)
                 }) {
                 Text(
-                    text = stringResource(R.string.already_have_account),
+                    text = stringResource(R.string.onboarding__login),
                     modifier = Modifier
                         .padding(top = 12.dp, bottom = 12.dp)
                         .align(Alignment.Center),

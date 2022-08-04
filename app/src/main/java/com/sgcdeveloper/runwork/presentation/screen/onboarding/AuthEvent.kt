@@ -6,6 +6,7 @@ sealed class AuthEvent {
     data class LogInByGoogle(val account: GoogleSignInAccount) : AuthEvent()
 
     object LogInByGoogleFailed : AuthEvent()
-    object LogInByEmail : AuthEvent()
     object SignOut : AuthEvent()
+
+    object GoLogInByEmail : AuthEvent()
 }

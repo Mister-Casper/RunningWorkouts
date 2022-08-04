@@ -37,7 +37,7 @@ fun RegistrationComponent(
             onSuccessful = { account -> onGoogleSignInSuccessful(account) },
             onFailed = { onGoogleSignInFailed() })
         Button(
-            onClick = { },
+            onClick = { actionEmail() },
             shape = RoundedCornerShape(24.dp),
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = black,
@@ -58,13 +58,10 @@ fun RegistrationComponent(
                     tint = white
                 )
                 Text(
-                    text = stringResource(R.string.email_registration),
+                    text = stringResource(R.string.onboarding__email_registration),
                     modifier = Modifier
                         .padding(start = 8.dp)
-                        .align(Alignment.CenterVertically)
-                        .clickable {
-                            actionEmail()
-                        },
+                        .align(Alignment.CenterVertically),
                     fontSize = 14.sp,
                     color = white,
                     fontWeight = FontWeight.ExtraBold

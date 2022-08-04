@@ -19,14 +19,14 @@ import com.sgcdeveloper.runwork.presentation.screen.onboarding.AuthViewModel
 import com.sgcdeveloper.runwork.presentation.theme.white
 
 @Composable
-@Destination("/registration")
+@Destination
 fun RegistrationScreen(navigator: DestinationsNavigator, authViewModel: AuthViewModel = hiltViewModel()) {
     FullscreenImage()
     Column(Modifier.fillMaxSize()) {
         BackButton(navigator = navigator)
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
-                text = stringResource(id = R.string.join_us),
+                text = stringResource(id = R.string.onboarding__registration_header),
                 color = white,
                 modifier = Modifier
                     .padding(top = 4.dp, start = 32.dp, bottom = 4.dp, end = 16.dp),
@@ -34,7 +34,7 @@ fun RegistrationScreen(navigator: DestinationsNavigator, authViewModel: AuthView
                 fontWeight = FontWeight.ExtraBold
             )
             Text(
-                text = stringResource(id = R.string.sign_up_any_way),
+                text = stringResource(id = R.string.onboarding__registration_description),
                 color = white,
                 modifier = Modifier
                     .padding(top = 16.dp, start = 32.dp, bottom = 24.dp, end = 16.dp),

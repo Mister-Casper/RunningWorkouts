@@ -1,4 +1,4 @@
-package com.sgcdeveloper.runwork.domain.google
+package com.sgcdeveloper.runwork.presentation.util.google
 
 import android.app.Activity
 import android.content.Context
@@ -12,7 +12,7 @@ import com.google.android.gms.tasks.Task
 class GoogleApiContract : ActivityResultContract<Int, Task<GoogleSignInAccount>?>() {
     override fun createIntent(context: Context, input: Int): Intent {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken("718397725897-ra1v9kjoroksctsv0n9sjf0a409le43e.apps.googleusercontent.com")
+            .requestIdToken("718397725897-ra1v9kjoroksctsv0n9sjf0a409le43e.apps.googleusercontent.com1")
             .requestEmail()
             .build()
 

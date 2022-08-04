@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.sp
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.common.api.ApiException
 import com.sgcdeveloper.runwork.R
-import com.sgcdeveloper.runwork.domain.google.GoogleApiContract
+import com.sgcdeveloper.runwork.presentation.util.google.GoogleApiContract
 import com.sgcdeveloper.runwork.presentation.theme.black
 import com.sgcdeveloper.runwork.presentation.theme.white
 
@@ -60,7 +60,7 @@ fun GoogleSignInButton(onSuccessful: (gsa: GoogleSignInAccount) -> Unit, onFaile
                     .align(Alignment.CenterVertically)
             )
             Text(
-                text = stringResource(R.string.continue_registration),
+                text = stringResource(R.string.onboarding__continue_registration),
                 modifier = Modifier
                     .padding(start = 8.dp)
                     .align(Alignment.CenterVertically),

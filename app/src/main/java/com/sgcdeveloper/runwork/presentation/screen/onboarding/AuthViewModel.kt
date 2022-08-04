@@ -8,6 +8,7 @@ import com.google.firebase.auth.GoogleAuthProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -15,11 +16,11 @@ import javax.inject.Inject
 class AuthViewModel @Inject constructor(private val firebaseAuth: FirebaseAuth) : ViewModel() {
 
     private val eventChannel = Channel<Event>()
-    val eventFlow = eventChannel.consumeAsFlow()
+    val eventFlow = eventChannel.receiveAsFlow()
 
     fun onEvent(event: AuthEvent) {
         when (event) {
-            is AuthEvent.LogInByEmail -> logInByEmail()
+            is AuthEvent.GoLogInByEmail -> logInByEmail()
             is AuthEvent.LogInByGoogle -> logInByGoogle(event.account)
             is AuthEvent.SignOut -> signOut()
             AuthEvent.LogInByGoogleFailed -> logInByGoogleFailed()
@@ -27,7 +28,9 @@ class AuthViewModel @Inject constructor(private val firebaseAuth: FirebaseAuth) 
     }
 
     private fun logInByGoogleFailed() {
-
+        viewModelScope.launch {
+            eventChannel.send(Event.GoogleAuthFailed)
+        }
     }
 
     private fun logInByEmail() {
@@ -40,12 +43,13 @@ class AuthViewModel @Inject constructor(private val firebaseAuth: FirebaseAuth) 
         val credential = GoogleAuthProvider.getCredential(account.idToken, null)
         firebaseAuth.signInWithCredential(credential)
             .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    viewModelScope.launch {
-                        eventChannel.send(Event.GoogleAuthSuccess)
+                viewModelScope.launch {
+                    val event = if (task.isSuccessful) {
+                        Event.GoogleAuthSuccess
+                    } else {
+                        Event.GoogleAuthFailed
                     }
-                } else {
-
+                    eventChannel.send(event)
                 }
             }
     }
@@ -56,6 +60,7 @@ class AuthViewModel @Inject constructor(private val firebaseAuth: FirebaseAuth) 
 
     sealed class Event {
         object GoogleAuthSuccess : Event()
+        object GoogleAuthFailed : Event()
         object LogInByEmail : Event()
     }
 }
