@@ -7,7 +7,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,7 +19,7 @@ class AuthViewModel @Inject constructor(private val firebaseAuth: FirebaseAuth) 
 
     fun onEvent(event: AuthEvent) {
         when (event) {
-            is AuthEvent.GoLogInByEmail -> logInByEmail()
+            is AuthEvent.GoLogInByEmail -> goLogInByEmail()
             is AuthEvent.LogInByGoogle -> logInByGoogle(event.account)
             is AuthEvent.SignOut -> signOut()
             AuthEvent.LogInByGoogleFailed -> logInByGoogleFailed()
@@ -33,9 +32,9 @@ class AuthViewModel @Inject constructor(private val firebaseAuth: FirebaseAuth) 
         }
     }
 
-    private fun logInByEmail() {
+    private fun goLogInByEmail() {
         viewModelScope.launch {
-            eventChannel.send(Event.LogInByEmail)
+            eventChannel.send(Event.GoLogInByEmail)
         }
     }
 
@@ -61,6 +60,6 @@ class AuthViewModel @Inject constructor(private val firebaseAuth: FirebaseAuth) 
     sealed class Event {
         object GoogleAuthSuccess : Event()
         object GoogleAuthFailed : Event()
-        object LogInByEmail : Event()
+        object GoLogInByEmail : Event()
     }
 }

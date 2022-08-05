@@ -55,7 +55,7 @@ fun StartScreen(navigator: DestinationsNavigator) {
                     .padding(top = 12.dp)
             ) {
                 Text(
-                    text = stringResource(R.string.onboarding__registration_header),
+                    text = stringResource(R.string.onboarding__registration),
                     modifier = Modifier.padding(top = 6.dp, bottom = 6.dp),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.ExtraBold

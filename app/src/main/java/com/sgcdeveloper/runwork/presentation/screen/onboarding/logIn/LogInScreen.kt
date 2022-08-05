@@ -42,7 +42,7 @@ fun LogInScreen(navigator: DestinationsNavigator, authViewModel: AuthViewModel =
                     is AuthViewModel.Event.GoogleAuthSuccess -> {
                         navigator.navigate(GetStartedScreenDestination)
                     }
-                    AuthViewModel.Event.LogInByEmail -> {
+                    AuthViewModel.Event.GoLogInByEmail -> {
                         navigator.navigate(LogInEmailScreenDestination)
                     }
                     AuthViewModel.Event.GoogleAuthFailed -> {

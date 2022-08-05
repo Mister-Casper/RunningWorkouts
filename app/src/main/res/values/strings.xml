@@ -14,5 +14,10 @@
     <string name="onboarding__continue_registration">CONTINUE</string>
     <string name="onboarding__email_registration">EMAIL</string>
     <string name="onboarding__google_auth_error">Login by Google not working</string>
+    <string name="onboarding_login_email_error">"Email is not correct "</string>
+    <string name="onboarding_login_password_error">Password is too short</string>
+    <string name="onboarding__login_button">LOGIN</string>
+    <string name="onboarding__password_registration">PASSWORD</string>
+    <string name="onboarding__forgot_password">FORGOT PASSWORD?</string>
 
 </resources>
