@@ -22,9 +22,10 @@ import com.sgcdeveloper.runwork.R
 import com.sgcdeveloper.runwork.presentation.util.google.GoogleApiContract
 import com.sgcdeveloper.runwork.presentation.theme.black
 import com.sgcdeveloper.runwork.presentation.theme.white
+import java.lang.Exception
 
 @Composable
-fun GoogleSignInButton(onSuccessful: (gsa: GoogleSignInAccount) -> Unit, onFailed: () -> Unit) {
+fun GoogleSignInButton(onSuccessful: (gsa: GoogleSignInAccount) -> Unit, onFailed: (error: Throwable) -> Unit) {
     val signInRequestCode = 1
 
     val authResultLauncher =
@@ -34,11 +35,9 @@ fun GoogleSignInButton(onSuccessful: (gsa: GoogleSignInAccount) -> Unit, onFaile
 
                 if (googleAccount != null) {
                     onSuccessful(googleAccount)
-                } else {
-                    onFailed()
                 }
-            } catch (e: ApiException) {
-                onFailed()
+            } catch (e: Exception) {
+                onFailed(e)
             }
         }
 

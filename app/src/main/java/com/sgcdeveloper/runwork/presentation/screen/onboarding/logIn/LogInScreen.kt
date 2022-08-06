@@ -1,6 +1,5 @@
 package com.sgcdeveloper.runwork.presentation.screen.onboarding.logIn
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -25,7 +24,7 @@ import com.sgcdeveloper.runwork.presentation.screen.destinations.LogInEmailScree
 import com.sgcdeveloper.runwork.presentation.screen.onboarding.AuthEvent
 import com.sgcdeveloper.runwork.presentation.screen.onboarding.AuthViewModel
 import com.sgcdeveloper.runwork.presentation.theme.white
-import es.dmoral.toasty.Toasty
+import com.sgcdeveloper.runwork.presentation.util.shoErrorToast
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -45,13 +44,8 @@ fun LogInScreen(navigator: DestinationsNavigator, authViewModel: AuthViewModel =
                     AuthViewModel.Event.GoLogInByEmail -> {
                         navigator.navigate(LogInEmailScreenDestination)
                     }
-                    AuthViewModel.Event.GoogleAuthFailed -> {
-                        Toasty.error(
-                            context,
-                            context.getString(R.string.onboarding__google_auth_error),
-                            Toast.LENGTH_SHORT,
-                            true
-                        ).show()
+                    is AuthViewModel.Event.GoogleAuthFailed -> {
+                        context.shoErrorToast(event.errorInfo)
                     }
                 }
             }
@@ -85,7 +79,7 @@ fun LogInScreenContent(navigator: DestinationsNavigator, authViewModel: AuthView
         Spacer(modifier = Modifier.weight(1f))
         RegistrationComponent(
             onGoogleSignInSuccessful = { account -> authViewModel.onEvent(AuthEvent.LogInByGoogle(account)) },
-            onGoogleSignInFailed = { authViewModel.onEvent(AuthEvent.LogInByGoogleFailed) },
+            onGoogleSignInFailed = { error -> authViewModel.onEvent(AuthEvent.LogInByGoogleFailed(error)) },
             actionEmail = { authViewModel.onEvent(AuthEvent.GoLogInByEmail) })
     }
 }

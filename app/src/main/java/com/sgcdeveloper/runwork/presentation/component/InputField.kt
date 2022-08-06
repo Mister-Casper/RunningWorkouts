@@ -5,16 +5,20 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -31,14 +35,15 @@ fun ColumnScope.InputField(
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
     padding: Dp = 10.dp,
-    keyboardActions: KeyboardActions = KeyboardActions { }
+    keyboardActions: KeyboardActions = KeyboardActions { focusManager?.moveFocus(FocusDirection.Down) },
+    modifier: Modifier = Modifier
 ) {
     TextField(
         singleLine = true,
         value = value,
         onValueChange = onValueChange,
         label = { Text(label) },
-        modifier = Modifier
+        modifier = modifier
             .align(Alignment.CenterHorizontally)
             .padding(top = 12.dp, start = padding, end = padding)
             .fillMaxWidth(),
@@ -65,5 +70,41 @@ fun ColumnScope.InputField(
         color = MaterialTheme.colors.error,
         style = MaterialTheme.typography.caption,
         modifier = Modifier.padding(start = 20.dp)
+    )
+}
+
+@Composable
+fun ColumnScope.PasswordInputField(
+    value: String,
+    onValueChange: (it: String) -> Unit,
+    label: String,
+    errorText: String?,
+    focusManager: FocusManager,
+    passwordVisibility: Boolean,
+    changePasswordVisibility: (isVisible: Boolean) -> Unit,
+    keyboardOptions: KeyboardOptions = KeyboardOptions(
+        keyboardType = KeyboardType.Password,
+        imeAction = ImeAction.Next
+    ),
+    keyboardActions: KeyboardActions = KeyboardActions { },
+    modifier: Modifier = Modifier
+) {
+    InputField(
+        value, onValueChange, label, errorText, focusManager,
+        trailingIcon = {
+            val image = if (passwordVisibility)
+                Icons.Filled.Visibility
+            else Icons.Filled.VisibilityOff
+
+            IconButton(onClick = {
+                changePasswordVisibility(!passwordVisibility)
+            }) {
+                Icon(imageVector = image, "")
+            }
+        },
+        visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
+        modifier = modifier
     )
 }

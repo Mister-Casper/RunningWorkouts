@@ -74,7 +74,8 @@ fun StartScreen(navigator: DestinationsNavigator) {
                         .align(Alignment.Center),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    color = white
                 )
             }
         }

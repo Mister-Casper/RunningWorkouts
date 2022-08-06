@@ -2,10 +2,13 @@ package com.sgcdeveloper.runwork.presentation.screen.onboarding.logInEmail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import com.sgcdeveloper.runwork.R
 import com.sgcdeveloper.runwork.domain.validators.EmailValidator
 import com.sgcdeveloper.runwork.domain.validators.PasswordValidator
 import com.sgcdeveloper.runwork.presentation.util.TextContainer
+import com.sgcdeveloper.runwork.presentation.util.TextContainer.Companion.getTextContainer
+import com.sgcdeveloper.runwork.presentation.util.getAuthErrorInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +20,8 @@ import javax.inject.Inject
 @HiltViewModel
 class LogInEmailViewModel @Inject constructor(
     private val emailValidator: EmailValidator,
-    private val passwordValidator: PasswordValidator
+    private val passwordValidator: PasswordValidator,
+    private val firebaseAuth: FirebaseAuth
 ) : ViewModel() {
 
     private val _logInEmailScreenState = MutableStateFlow(LogInScreenState())
@@ -36,11 +40,17 @@ class LogInEmailViewModel @Inject constructor(
                 updatePassword(logInEvent.password)
                 clearPasswordError()
             }
-            LogInEvent.LogIn -> {
-                logIn()
+            LogInEvent.Action -> {
+                doAction()
             }
             LogInEvent.ForgotPassword -> {
-
+                goToForgotPasswordScreen()
+            }
+            LogInEvent.BackPressed -> {
+                onBackPressed()
+            }
+            is LogInEvent.UpdatePasswordVisibility -> {
+                changePasswordVisibility(logInEvent.isVisible)
             }
         }
     }
@@ -61,7 +71,18 @@ class LogInEmailViewModel @Inject constructor(
         _logInEmailScreenState.value = _logInEmailScreenState.value.copy(passwordError = null)
     }
 
-    private fun logIn() {
+    private fun doAction() {
+        when (_logInEmailScreenState.value.loginState) {
+            LoginState.LOGIN -> {
+                doLogInAction()
+            }
+            LoginState.FORGOT_PASSWORD -> {
+                doForgotPasswordAction()
+            }
+        }
+    }
+
+    private fun doLogInAction() {
         val isEmailValid = emailValidator.isValid(_logInEmailScreenState.value.email)
         val isPasswordValid = passwordValidator.isValid(_logInEmailScreenState.value.password)
         when {
@@ -72,14 +93,58 @@ class LogInEmailViewModel @Inject constructor(
                 showPasswordError()
             }
             else -> {
-                loginSuccess()
+                tryToLogIn()
             }
         }
     }
 
+    private fun tryToLogIn() {
+        firebaseAuth.createUserWithEmailAndPassword(
+            _logInEmailScreenState.value.email,
+            _logInEmailScreenState.value.password
+        )
+            .addOnSuccessListener {
+                viewModelScope.launch {
+                    _eventChannel.send(Event.LogInSuccess)
+                }
+            }.addOnFailureListener {
+                viewModelScope.launch {
+                    _eventChannel.send(Event.LogInFailed(it.getAuthErrorInfo()))
+                }
+            }
+    }
+
+    private fun doForgotPasswordAction() {
+        val isEmailValid = emailValidator.isValid(_logInEmailScreenState.value.email)
+        when {
+            !isEmailValid -> {
+                showEmailError()
+            }
+            else -> {
+                doSendForgotPasswordEmail()
+            }
+        }
+    }
+
+    private fun doSendForgotPasswordEmail() {
+        firebaseAuth.sendPasswordResetEmail(
+            _logInEmailScreenState.value.email
+        )
+            .addOnSuccessListener {
+                goToLogInEmailScreen()
+                viewModelScope.launch {
+                    _eventChannel.send(Event.ForgotPasswordSuccess(getTextContainer(R.string.forgot_password_success)))
+                }
+            }.addOnFailureListener {
+                viewModelScope.launch {
+                    _eventChannel.send(Event.ForgotPasswordFailed(it.getAuthErrorInfo()))
+                }
+            }
+    }
+
     private fun showEmailError() {
         _logInEmailScreenState.value = _logInEmailScreenState.value.copy(
-            emailError = TextContainer.getTextContainer(
+            emailError = getTextContainer(
                 R.string.onboarding_login_email_error
             )
         )
@@ -87,26 +152,69 @@ class LogInEmailViewModel @Inject constructor(
 
     private fun showPasswordError() {
         _logInEmailScreenState.value = _logInEmailScreenState.value.copy(
-            passwordError = TextContainer.getTextContainer(
+            passwordError = getTextContainer(
                 R.string.onboarding_login_password_error
             )
         )
     }
 
-    private fun loginSuccess() {
+    private fun goToForgotPasswordScreen() {
+        _logInEmailScreenState.value = _logInEmailScreenState.value.copy(
+            loginState = LoginState.FORGOT_PASSWORD
+        )
         viewModelScope.launch {
-            _eventChannel.send(Event.LogIn)
+            _eventChannel.send(Event.GoToForgotPasswordScreen)
         }
     }
 
+    private fun goToLogInEmailScreen() {
+        _logInEmailScreenState.value = _logInEmailScreenState.value.copy(
+            loginState = LoginState.LOGIN,
+        )
+        viewModelScope.launch {
+            _eventChannel.send(Event.GoToLogInScreen)
+        }
+    }
+
+    private fun onBackPressed() {
+        if (_logInEmailScreenState.value.loginState == LoginState.FORGOT_PASSWORD) {
+            goToLogInEmailScreen()
+        } else {
+            viewModelScope.launch {
+                _eventChannel.send(Event.GoBack)
+            }
+        }
+    }
+
+    fun changePasswordVisibility(isPasswordVisible: Boolean) {
+        _logInEmailScreenState.value = _logInEmailScreenState.value.copy(
+            isPasswordVisible = isPasswordVisible
+        )
+    }
+
     data class LogInScreenState(
+        val loginState: LoginState = LoginState.LOGIN,
         val email: String = "",
         val password: String = "",
+        val isPasswordVisible: Boolean = false,
         val emailError: TextContainer? = null,
         val passwordError: TextContainer? = null,
     )
 
+    enum class LoginState(val actionButtonText: TextContainer) {
+        LOGIN(getTextContainer(R.string.onboarding__login_action_button)),
+        FORGOT_PASSWORD(getTextContainer(R.string.onboarding__reset_password_action_button))
+    }
+
     sealed class Event {
-        object LogIn : Event()
+        object GoToLogInScreen : Event()
+        object GoToForgotPasswordScreen : Event()
+        object GoBack : Event()
+
+        object LogInSuccess : Event()
+        data class LogInFailed(val errorInfo: TextContainer) : Event()
+
+        data class ForgotPasswordSuccess(val infoMessage: TextContainer) : Event()
+        data class ForgotPasswordFailed(val errorInfo: TextContainer) : Event()
     }
 }

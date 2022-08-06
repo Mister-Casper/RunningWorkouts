@@ -25,7 +25,7 @@ import com.sgcdeveloper.runwork.presentation.theme.white
 @Composable
 fun RegistrationComponent(
     onGoogleSignInSuccessful: (account: GoogleSignInAccount) -> Unit,
-    onGoogleSignInFailed: () -> Unit,
+    onGoogleSignInFailed: (error: Throwable) -> Unit,
     actionEmail: () -> Unit = {}
 ) {
     Column(
@@ -35,7 +35,7 @@ fun RegistrationComponent(
     ) {
         GoogleSignInButton(
             onSuccessful = { account -> onGoogleSignInSuccessful(account) },
-            onFailed = { onGoogleSignInFailed() })
+            onFailed = { error -> onGoogleSignInFailed(error) })
         Button(
             onClick = { actionEmail() },
             shape = RoundedCornerShape(24.dp),
