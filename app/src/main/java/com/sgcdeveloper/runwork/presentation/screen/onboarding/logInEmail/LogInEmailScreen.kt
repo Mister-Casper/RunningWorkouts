@@ -1,6 +1,7 @@
 package com.sgcdeveloper.runwork.presentation.screen.onboarding.logInEmail
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.tween
@@ -45,9 +46,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-private const val FORGOT_PASSWORD_DEFAULT_OFFSET = 0f
-private const val FORGOT_PASSWORD_TARGET_ANIMATED_OFFSET = -100f
-
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 @Destination
@@ -60,8 +58,8 @@ fun LogInEmailScreen(navigator: DestinationsNavigator, logInEmailViewModel: LogI
     val screenState = logInEmailViewModel.logInEmailScreenState.collectAsState().value
 
     val coroutinesScope = rememberCoroutineScope()
-    val passwordVisibilityAnimation = remember { Animatable(VISIBLE) }
-    val forgotPasswordAnimationOffsetY = remember { Animatable(0f) }
+
+    val passwordAlphaAnimation = remember { Animatable(1f) }
 
     LaunchedEffect(Unit) {
         lifecycleOwner.lifecycleScope.launchWhenStarted {
@@ -70,8 +68,7 @@ fun LogInEmailScreen(navigator: DestinationsNavigator, logInEmailViewModel: LogI
                     is LogInEmailViewModel.Event.GoToForgotPasswordScreen -> {
                         goToForgotPasswordScreenAnimation(
                             coroutinesScope,
-                            passwordVisibilityAnimation,
-                            forgotPasswordAnimationOffsetY
+                            passwordAlphaAnimation,
                         )
                     }
                     is LogInEmailViewModel.Event.LogInSuccess -> {
@@ -83,8 +80,7 @@ fun LogInEmailScreen(navigator: DestinationsNavigator, logInEmailViewModel: LogI
                     LogInEmailViewModel.Event.GoToLogInScreen -> {
                         goToLogInScreenAnimation(
                             coroutinesScope,
-                            passwordVisibilityAnimation,
-                            forgotPasswordAnimationOffsetY
+                            passwordAlphaAnimation,
                         )
                     }
                     is LogInEmailViewModel.Event.ForgotPasswordFailed -> {
@@ -124,27 +120,25 @@ fun LogInEmailScreen(navigator: DestinationsNavigator, logInEmailViewModel: LogI
             focusManager = focusManager,
             keyboardActions = emailFieldKeyboardAction
         )
-        PasswordInputField(
-            label = stringResource(id = R.string.onboarding__password_registration),
-            value = screenState.password,
-            onValueChange = { newPassword ->
-                logInEmailViewModel.onEvent(LogInEvent.UpdatePassword(newPassword))
-            },
-            errorText = screenState.passwordError?.getString(),
-            focusManager = focusManager,
-            passwordVisibility = screenState.isPasswordVisible,
-            changePasswordVisibility = {
-                logInEmailViewModel.onEvent(LogInEvent.UpdatePasswordVisibility(it))
-            },
-            modifier = Modifier.alpha(passwordVisibilityAnimation.value),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
-            keyboardActions = lastFieldKeyboardAction
-        )
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .offset(y = forgotPasswordAnimationOffsetY.value.dp)
-        ) {
+        AnimatedVisibility(visible = screenState.loginState == LogInEmailViewModel.LoginState.LOGIN) {
+            PasswordInputField(
+                label = stringResource(id = R.string.onboarding__password_registration),
+                value = screenState.password,
+                onValueChange = { newPassword ->
+                    logInEmailViewModel.onEvent(LogInEvent.UpdatePassword(newPassword))
+                },
+                errorText = screenState.passwordError?.getString(),
+                focusManager = focusManager,
+                passwordVisibility = screenState.isPasswordVisible,
+                changePasswordVisibility = {
+                    logInEmailViewModel.onEvent(LogInEvent.UpdatePasswordVisibility(it))
+                },
+                modifier = Modifier.alpha(passwordAlphaAnimation.value),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+                keyboardActions = lastFieldKeyboardAction
+            )
+        }
+        Column(Modifier.fillMaxWidth()) {
             ActionButtonBlock(screenState.loginState.actionButtonText.getString()) {
                 logInEmailViewModel.onEvent(LogInEvent.Action)
             }
@@ -204,32 +198,18 @@ private fun ForgotPasswordBlock(onClick: () -> Unit) {
 
 private fun goToForgotPasswordScreenAnimation(
     coroutinesScope: CoroutineScope,
-    passwordVisibilityAnimation: Animatable<Float, AnimationVector1D>,
-    forgotPasswordAnimationOffsetY: Animatable<Float, AnimationVector1D>
+    passwordAlphaAnimation: Animatable<Float, AnimationVector1D>,
 ) {
     coroutinesScope.launch {
-        passwordVisibilityAnimation.animateTo(INVISIBLE, animationSpec = tween(LONG_ANIMATION_TIME))
-    }
-    coroutinesScope.launch {
-        forgotPasswordAnimationOffsetY.animateTo(
-            FORGOT_PASSWORD_TARGET_ANIMATED_OFFSET,
-            animationSpec = tween(LONG_ANIMATION_TIME)
-        )
+        passwordAlphaAnimation.animateTo(0f, animationSpec = tween(LONG_ANIMATION_TIME))
     }
 }
 
 private fun goToLogInScreenAnimation(
     coroutinesScope: CoroutineScope,
     passwordVisibilityAnimation: Animatable<Float, AnimationVector1D>,
-    forgotPasswordAnimationOffsetY: Animatable<Float, AnimationVector1D>
 ) {
     coroutinesScope.launch {
         passwordVisibilityAnimation.animateTo(VISIBLE, animationSpec = tween(LONG_ANIMATION_TIME))
-    }
-    coroutinesScope.launch {
-        forgotPasswordAnimationOffsetY.animateTo(
-            FORGOT_PASSWORD_DEFAULT_OFFSET,
-            animationSpec = tween(LONG_ANIMATION_TIME)
-        )
     }
 }

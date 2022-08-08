@@ -24,6 +24,8 @@ import com.sgcdeveloper.runwork.presentation.theme.black
 import com.sgcdeveloper.runwork.presentation.theme.white
 import java.lang.Exception
 
+private const val GOOGLE_SIGN_IN_CANCELED = 12501
+
 @Composable
 fun GoogleSignInButton(onSuccessful: (gsa: GoogleSignInAccount) -> Unit, onFailed: (error: Throwable) -> Unit) {
     val signInRequestCode = 1
@@ -36,8 +38,10 @@ fun GoogleSignInButton(onSuccessful: (gsa: GoogleSignInAccount) -> Unit, onFaile
                 if (googleAccount != null) {
                     onSuccessful(googleAccount)
                 }
-            } catch (e: Exception) {
-                onFailed(e)
+            } catch (e: ApiException) {
+                if (e.statusCode != GOOGLE_SIGN_IN_CANCELED) {
+                    onFailed(e)
+                }
             }
         }
 

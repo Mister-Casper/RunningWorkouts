@@ -34,11 +34,12 @@ class LogInEmailViewModel @Inject constructor(
         when (logInEvent) {
             is LogInEvent.UpdateEmail -> {
                 updateEmail(logInEvent.email)
-                clearEmailError()
             }
             is LogInEvent.UpdatePassword -> {
                 updatePassword(logInEvent.password)
-                clearPasswordError()
+            }
+            is LogInEvent.UpdatePasswordVisibility -> {
+                changePasswordVisibility(logInEvent.isVisible)
             }
             LogInEvent.Action -> {
                 doAction()
@@ -49,26 +50,15 @@ class LogInEmailViewModel @Inject constructor(
             LogInEvent.BackPressed -> {
                 onBackPressed()
             }
-            is LogInEvent.UpdatePasswordVisibility -> {
-                changePasswordVisibility(logInEvent.isVisible)
-            }
         }
     }
 
-    private fun updateEmail(email: String) {
-        _logInEmailScreenState.value = _logInEmailScreenState.value.copy(email = email)
+    private fun updateEmail(newEmail: String) {
+        _logInEmailScreenState.value = _logInEmailScreenState.value.copy(email = newEmail, emailError = null)
     }
 
-    private fun updatePassword(password: String) {
-        _logInEmailScreenState.value = _logInEmailScreenState.value.copy(password = password)
-    }
-
-    private fun clearEmailError() {
-        _logInEmailScreenState.value = _logInEmailScreenState.value.copy(emailError = null)
-    }
-
-    private fun clearPasswordError() {
-        _logInEmailScreenState.value = _logInEmailScreenState.value.copy(passwordError = null)
+    private fun updatePassword(newPassword: String) {
+        _logInEmailScreenState.value = _logInEmailScreenState.value.copy(password = newPassword, passwordError = null)
     }
 
     private fun doAction() {
@@ -99,7 +89,7 @@ class LogInEmailViewModel @Inject constructor(
     }
 
     private fun tryToLogIn() {
-        firebaseAuth.createUserWithEmailAndPassword(
+        firebaseAuth.signInWithEmailAndPassword(
             _logInEmailScreenState.value.email,
             _logInEmailScreenState.value.password
         )
@@ -160,7 +150,9 @@ class LogInEmailViewModel @Inject constructor(
 
     private fun goToForgotPasswordScreen() {
         _logInEmailScreenState.value = _logInEmailScreenState.value.copy(
-            loginState = LoginState.FORGOT_PASSWORD
+            loginState = LoginState.FORGOT_PASSWORD,
+            emailError = null,
+            passwordError = null
         )
         viewModelScope.launch {
             _eventChannel.send(Event.GoToForgotPasswordScreen)
@@ -170,6 +162,8 @@ class LogInEmailViewModel @Inject constructor(
     private fun goToLogInEmailScreen() {
         _logInEmailScreenState.value = _logInEmailScreenState.value.copy(
             loginState = LoginState.LOGIN,
+            emailError = null,
+            passwordError = null
         )
         viewModelScope.launch {
             _eventChannel.send(Event.GoToLogInScreen)
@@ -186,7 +180,7 @@ class LogInEmailViewModel @Inject constructor(
         }
     }
 
-    fun changePasswordVisibility(isPasswordVisible: Boolean) {
+    private fun changePasswordVisibility(isPasswordVisible: Boolean) {
         _logInEmailScreenState.value = _logInEmailScreenState.value.copy(
             isPasswordVisible = isPasswordVisible
         )
@@ -207,14 +201,13 @@ class LogInEmailViewModel @Inject constructor(
     }
 
     sealed class Event {
+        data class ForgotPasswordSuccess(val infoMessage: TextContainer) : Event()
+        data class LogInFailed(val errorInfo: TextContainer) : Event()
+        data class ForgotPasswordFailed(val errorInfo: TextContainer) : Event()
+
         object GoToLogInScreen : Event()
         object GoToForgotPasswordScreen : Event()
         object GoBack : Event()
-
         object LogInSuccess : Event()
-        data class LogInFailed(val errorInfo: TextContainer) : Event()
-
-        data class ForgotPasswordSuccess(val infoMessage: TextContainer) : Event()
-        data class ForgotPasswordFailed(val errorInfo: TextContainer) : Event()
     }
 }

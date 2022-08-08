@@ -87,7 +87,8 @@ fun ColumnScope.PasswordInputField(
         imeAction = ImeAction.Next
     ),
     keyboardActions: KeyboardActions = KeyboardActions { },
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    trillingIconColor: Color = white
 ) {
     InputField(
         value, onValueChange, label, errorText, focusManager,
@@ -99,7 +100,7 @@ fun ColumnScope.PasswordInputField(
             IconButton(onClick = {
                 changePasswordVisibility(!passwordVisibility)
             }) {
-                Icon(imageVector = image, "")
+                Icon(imageVector = image, "", tint = trillingIconColor)
             }
         },
         visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
