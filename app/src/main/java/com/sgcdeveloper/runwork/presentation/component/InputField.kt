@@ -1,5 +1,6 @@
 package com.sgcdeveloper.runwork.presentation.component
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -25,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.sgcdeveloper.runwork.presentation.theme.white
 
 @Composable
-fun ColumnScope.InputField(
+fun InputField(
     value: String,
     onValueChange: (it: String) -> Unit,
     label: String,
@@ -38,43 +39,45 @@ fun ColumnScope.InputField(
     keyboardActions: KeyboardActions = KeyboardActions { focusManager?.moveFocus(FocusDirection.Down) },
     modifier: Modifier = Modifier
 ) {
-    TextField(
-        singleLine = true,
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text(label) },
-        modifier = modifier
-            .align(Alignment.CenterHorizontally)
-            .padding(top = 12.dp, start = padding, end = padding)
-            .fillMaxWidth(),
-        keyboardOptions = keyboardOptions,
-        trailingIcon = trailingIcon,
-        visualTransformation = visualTransformation,
-        keyboardActions = keyboardActions,
-        colors = TextFieldDefaults.textFieldColors(
-            backgroundColor = Color.Transparent,
-            cursorColor = white,
-            textColor = white,
-            disabledLabelColor = white,
-            focusedLabelColor = white,
-            unfocusedLabelColor = white,
-            disabledIndicatorColor = white,
-            unfocusedIndicatorColor = white,
-            focusedIndicatorColor = white,
-        ),
-        isError = errorText != null,
-    )
+    Column {
+        TextField(
+            singleLine = true,
+            value = value,
+            onValueChange = onValueChange,
+            label = { Text(label) },
+            modifier = modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(top = 12.dp, start = padding, end = padding)
+                .fillMaxWidth(),
+            keyboardOptions = keyboardOptions,
+            trailingIcon = trailingIcon,
+            visualTransformation = visualTransformation,
+            keyboardActions = keyboardActions,
+            colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = Color.Transparent,
+                cursorColor = white,
+                textColor = white,
+                disabledLabelColor = white,
+                focusedLabelColor = white,
+                unfocusedLabelColor = white,
+                disabledIndicatorColor = white,
+                unfocusedIndicatorColor = white,
+                focusedIndicatorColor = white,
+            ),
+            isError = errorText != null,
+        )
 
-    Text(
-        text = errorText.orEmpty(),
-        color = MaterialTheme.colors.error,
-        style = MaterialTheme.typography.caption,
-        modifier = Modifier.padding(start = 20.dp)
-    )
+        Text(
+            text = errorText.orEmpty(),
+            color = MaterialTheme.colors.error,
+            style = MaterialTheme.typography.caption,
+            modifier = Modifier.padding(start = 20.dp)
+        )
+    }
 }
 
 @Composable
-fun ColumnScope.PasswordInputField(
+fun PasswordInputField(
     value: String,
     onValueChange: (it: String) -> Unit,
     label: String,

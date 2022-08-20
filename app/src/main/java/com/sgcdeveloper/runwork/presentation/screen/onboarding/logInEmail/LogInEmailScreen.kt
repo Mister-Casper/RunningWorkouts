@@ -14,6 +14,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -30,7 +31,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.sgcdeveloper.runwork.R
@@ -43,7 +45,6 @@ import com.sgcdeveloper.runwork.presentation.theme.dark_gray
 import com.sgcdeveloper.runwork.presentation.theme.white
 import com.sgcdeveloper.runwork.presentation.util.*
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -62,8 +63,8 @@ fun LogInEmailScreen(navigator: DestinationsNavigator, logInEmailViewModel: LogI
     val passwordAlphaAnimation = remember { Animatable(1f) }
 
     LaunchedEffect(Unit) {
-        lifecycleOwner.lifecycleScope.launchWhenStarted {
-            logInEmailViewModel.eventFlow.collectLatest { event ->
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+            logInEmailViewModel.eventFlow.collect { event ->
                 when (event) {
                     is LogInEmailViewModel.Event.GoToForgotPasswordScreen -> {
                         goToForgotPasswordScreenAnimation(
@@ -83,21 +84,18 @@ fun LogInEmailScreen(navigator: DestinationsNavigator, logInEmailViewModel: LogI
                             passwordAlphaAnimation,
                         )
                     }
-                    is LogInEmailViewModel.Event.ForgotPasswordFailed -> {
+                    is LogInEmailViewModel.Event.Error -> {
                         context.shoErrorToast(event.errorInfo)
                     }
-                    is LogInEmailViewModel.Event.ForgotPasswordSuccess -> {
+                    is LogInEmailViewModel.Event.Info -> {
                         context.showSuccessToast(event.infoMessage)
-                    }
-                    is LogInEmailViewModel.Event.LogInFailed -> {
-                        context.shoErrorToast(event.errorInfo)
                     }
                 }
             }
         }
     }
 
-    FullscreenImage(gradientColors = listOf(dark_gray, Color.Transparent, Color.Transparent))
+    FullscreenImage(gradientColors = listOf(dark_gray, dark_gray.copy(0.7f), Color.Transparent, Color.Transparent))
 
     Column(Modifier.padding(start = 6.dp, end = 6.dp, top = 16.dp)) {
         val lastFieldKeyboardAction = KeyboardActions(onDone = {
@@ -133,7 +131,9 @@ fun LogInEmailScreen(navigator: DestinationsNavigator, logInEmailViewModel: LogI
                 changePasswordVisibility = {
                     logInEmailViewModel.onEvent(LogInEvent.UpdatePasswordVisibility(it))
                 },
-                modifier = Modifier.alpha(passwordAlphaAnimation.value),
+                modifier = Modifier
+                    .alpha(passwordAlphaAnimation.value)
+                    .padding(bottom = 16.dp),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
                 keyboardActions = lastFieldKeyboardAction
             )
@@ -166,7 +166,7 @@ private fun ActionButtonBlock(actionTest: String, onClick: () -> Unit) {
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 32.dp)
+            .padding(top = 16.dp)
     ) {
         Text(
             text = actionTest,
@@ -181,14 +181,15 @@ private fun ActionButtonBlock(actionTest: String, onClick: () -> Unit) {
 private fun ForgotPasswordBlock(onClick: () -> Unit) {
     Box(
         modifier = Modifier
-            .padding(start = 8.dp, top = 12.dp)
+            .padding(start = 8.dp, top = 16.dp)
             .clickable {
                 onClick()
             }
     ) {
         Text(
             text = stringResource(id = R.string.onboarding__forgot_password),
-            modifier = Modifier.padding(top = 6.dp, end = 6.dp, start = 6.dp, bottom = 6.dp),
+            modifier = Modifier
+                .padding(top = 6.dp, end = 6.dp, start = 6.dp, bottom = 6.dp),
             fontSize = 16.sp,
             fontWeight = FontWeight.ExtraBold,
             color = white

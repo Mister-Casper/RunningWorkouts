@@ -22,6 +22,6 @@
     <string name="onboarding__reset_password_action_button">RESET PASSWORD</string>
     <string name="onboarding_login_invalid_email">Email is invalid</string>
     <string name="onboarding_login_already_exist">User with this email already exists</string>
-    <string name="forgot_password_success">"A message with instructions has been sent to your email "</string>
+    <string name="onboarding_password_email_sent">"A message with instructions has been sent to your email "</string>
 
 </resources>
