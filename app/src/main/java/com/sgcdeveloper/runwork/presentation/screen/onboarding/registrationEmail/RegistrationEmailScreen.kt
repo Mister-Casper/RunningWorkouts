@@ -1,12 +1,12 @@
 package com.sgcdeveloper.runwork.presentation.screen.onboarding.registrationEmail
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationVector1D
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -42,9 +42,8 @@ import com.sgcdeveloper.runwork.presentation.screen.destinations.MainScreenDesti
 import com.sgcdeveloper.runwork.presentation.theme.dark_blue
 import com.sgcdeveloper.runwork.presentation.theme.dark_gray
 import com.sgcdeveloper.runwork.presentation.theme.white
-import com.sgcdeveloper.runwork.presentation.util.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import com.sgcdeveloper.runwork.presentation.util.shoErrorToast
+import com.sgcdeveloper.runwork.presentation.util.showSuccessToast
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -57,31 +56,17 @@ fun RegistrationEmailScreen(navigator: DestinationsNavigator, registrationEmailV
 
     val screenState = registrationEmailViewModel.logInEmailScreenState.collectAsState().value
 
-    val coroutinesScope = rememberCoroutineScope()
-
     val passwordAlphaAnimation = remember { Animatable(1f) }
 
     LaunchedEffect(Unit) {
         lifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
             registrationEmailViewModel.eventFlow.collect { event ->
                 when (event) {
-                    is RegistrationEmailViewModel.Event.GoToForgotPasswordScreen -> {
-                        goToForgotPasswordScreenAnimation(
-                            coroutinesScope,
-                            passwordAlphaAnimation,
-                        )
-                    }
                     is RegistrationEmailViewModel.Event.LogInSuccess -> {
                         navigator.navigate(MainScreenDestination())
                     }
                     RegistrationEmailViewModel.Event.GoBack -> {
                         navigator.navigateUp()
-                    }
-                    RegistrationEmailViewModel.Event.GoToLogInScreen -> {
-                        goToLogInScreenAnimation(
-                            coroutinesScope,
-                            passwordAlphaAnimation,
-                        )
                     }
                     is RegistrationEmailViewModel.Event.Error -> {
                         context.shoErrorToast(event.errorInfo)
@@ -148,10 +133,6 @@ fun RegistrationEmailScreen(navigator: DestinationsNavigator, registrationEmailV
             }
         }
     }
-
-    BackHandler {
-        registrationEmailViewModel.onEvent(RegistrationEvent.BackPressed)
-    }
 }
 
 @Composable
@@ -193,23 +174,5 @@ private fun ForgotPasswordBlock(onClick: () -> Unit) {
             fontWeight = FontWeight.ExtraBold,
             color = white
         )
-    }
-}
-
-private fun goToForgotPasswordScreenAnimation(
-    coroutinesScope: CoroutineScope,
-    passwordAlphaAnimation: Animatable<Float, AnimationVector1D>,
-) {
-    coroutinesScope.launch {
-        passwordAlphaAnimation.animateTo(0f, animationSpec = tween(LONG_ANIMATION_TIME))
-    }
-}
-
-private fun goToLogInScreenAnimation(
-    coroutinesScope: CoroutineScope,
-    passwordVisibilityAnimation: Animatable<Float, AnimationVector1D>,
-) {
-    coroutinesScope.launch {
-        passwordVisibilityAnimation.animateTo(VISIBLE, animationSpec = tween(LONG_ANIMATION_TIME))
     }
 }

@@ -135,7 +135,6 @@ class RegistrationEmailViewModel @Inject constructor(
                 passwordError = null
             )
         }
-        sendEvent(_eventChannel, Event.GoToForgotPasswordScreen)
     }
 
     private fun goToLogInEmailScreen() {
@@ -146,7 +145,6 @@ class RegistrationEmailViewModel @Inject constructor(
                 passwordError = null
             )
         }
-        sendEvent(_eventChannel, Event.GoToLogInScreen)
     }
 
     private fun onBackPressed() {
@@ -182,8 +180,6 @@ class RegistrationEmailViewModel @Inject constructor(
         data class Info(val infoMessage: TextContainer) : Event()
         data class Error(val errorInfo: TextContainer) : Event()
 
-        object GoToLogInScreen : Event()
-        object GoToForgotPasswordScreen : Event()
         object GoBack : Event()
         object LogInSuccess : Event()
     }

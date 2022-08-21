@@ -58,31 +58,17 @@ fun LogInEmailScreen(navigator: DestinationsNavigator, logInEmailViewModel: LogI
 
     val screenState = logInEmailViewModel.logInEmailScreenState.collectAsState().value
 
-    val coroutinesScope = rememberCoroutineScope()
-
     val passwordAlphaAnimation = remember { Animatable(1f) }
 
     LaunchedEffect(Unit) {
         lifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
             logInEmailViewModel.eventFlow.collect { event ->
                 when (event) {
-                    is LogInEmailViewModel.Event.GoToForgotPasswordScreen -> {
-                        goToForgotPasswordScreenAnimation(
-                            coroutinesScope,
-                            passwordAlphaAnimation,
-                        )
-                    }
                     is LogInEmailViewModel.Event.LogInSuccess -> {
                         navigator.navigate(MainScreenDestination())
                     }
                     LogInEmailViewModel.Event.GoBack -> {
                         navigator.navigateUp()
-                    }
-                    LogInEmailViewModel.Event.GoToLogInScreen -> {
-                        goToLogInScreenAnimation(
-                            coroutinesScope,
-                            passwordAlphaAnimation,
-                        )
                     }
                     is LogInEmailViewModel.Event.Error -> {
                         context.shoErrorToast(event.errorInfo)
@@ -194,23 +180,5 @@ private fun ForgotPasswordBlock(onClick: () -> Unit) {
             fontWeight = FontWeight.ExtraBold,
             color = white
         )
-    }
-}
-
-private fun goToForgotPasswordScreenAnimation(
-    coroutinesScope: CoroutineScope,
-    passwordAlphaAnimation: Animatable<Float, AnimationVector1D>,
-) {
-    coroutinesScope.launch {
-        passwordAlphaAnimation.animateTo(0f, animationSpec = tween(LONG_ANIMATION_TIME))
-    }
-}
-
-private fun goToLogInScreenAnimation(
-    coroutinesScope: CoroutineScope,
-    passwordVisibilityAnimation: Animatable<Float, AnimationVector1D>,
-) {
-    coroutinesScope.launch {
-        passwordVisibilityAnimation.animateTo(VISIBLE, animationSpec = tween(LONG_ANIMATION_TIME))
     }
 }
