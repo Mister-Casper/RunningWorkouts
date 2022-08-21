@@ -1,10 +1,8 @@
-package com.sgcdeveloper.runwork.presentation.screen.onboarding.logInEmail
+package com.sgcdeveloper.runwork.presentation.screen.onboarding.registrationEmail
 
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.sgcdeveloper.runwork.R
-import com.sgcdeveloper.runwork.data.model.core.OnboardingStatus
-import com.sgcdeveloper.runwork.domain.repository.AppRepository
 import com.sgcdeveloper.runwork.domain.validators.EmailValidator
 import com.sgcdeveloper.runwork.domain.validators.PasswordValidator
 import com.sgcdeveloper.runwork.presentation.util.TextContainer
@@ -15,15 +13,13 @@ import com.sgcdeveloper.runwork.presentation.util.sendEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
-import java.lang.Exception
 import javax.inject.Inject
 
 @HiltViewModel
-class LogInEmailViewModel @Inject constructor(
+class RegistrationEmailViewModel @Inject constructor(
     private val emailValidator: EmailValidator,
     private val passwordValidator: PasswordValidator,
-    private val firebaseAuth: FirebaseAuth,
-    private val appRepository: AppRepository
+    private val firebaseAuth: FirebaseAuth
 ) : ViewModel() {
 
     private val _logInEmailScreenState = MutableStateFlow(LogInScreenState())
@@ -32,24 +28,24 @@ class LogInEmailViewModel @Inject constructor(
     private val _eventChannel = Channel<Event>(Channel.BUFFERED)
     val eventFlow = _eventChannel.receiveAsFlow()
 
-    fun onEvent(logInEvent: LogInEvent) {
-        when (logInEvent) {
-            is LogInEvent.UpdateEmail -> {
-                updateEmail(logInEvent.email)
+    fun onEvent(registrationEvent: RegistrationEvent) {
+        when (registrationEvent) {
+            is RegistrationEvent.UpdateEmail -> {
+                updateEmail(registrationEvent.email)
             }
-            is LogInEvent.UpdatePassword -> {
-                updatePassword(logInEvent.password)
+            is RegistrationEvent.UpdatePassword -> {
+                updatePassword(registrationEvent.password)
             }
-            is LogInEvent.UpdatePasswordVisibility -> {
-                changePasswordVisibility(logInEvent.isVisible)
+            is RegistrationEvent.UpdatePasswordVisibility -> {
+                changePasswordVisibility(registrationEvent.isVisible)
             }
-            LogInEvent.Action -> {
+            RegistrationEvent.Action -> {
                 doAction()
             }
-            LogInEvent.ForgotPassword -> {
+            RegistrationEvent.ForgotPassword -> {
                 goToForgotPasswordScreen()
             }
-            LogInEvent.BackPressed -> {
+            RegistrationEvent.BackPressed -> {
                 onBackPressed()
             }
         }
@@ -94,16 +90,11 @@ class LogInEmailViewModel @Inject constructor(
         firebaseAuth.signInWithEmailAndPassword(
             _logInEmailScreenState.value.email,
             _logInEmailScreenState.value.password
-        ).observe(onSuccess = { logIn() }, onFailure = { logInFailed(it) })
-    }
-
-    private fun logIn() {
-        appRepository.setOnboardingStatus(OnboardingStatus.FINISH)
-        sendEvent(_eventChannel, Event.LogInSuccess)
-    }
-
-    private fun logInFailed(exception: Exception) {
-        sendEvent(_eventChannel, Event.Error(exception.getAuthErrorInfo()))
+        ).observe(onSuccess = {
+            sendEvent(_eventChannel, Event.LogInSuccess)
+        }, onFailure = {
+            sendEvent(_eventChannel, Event.Error(it.getAuthErrorInfo()))
+        })
     }
 
     private fun doForgotPasswordAction() {

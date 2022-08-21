@@ -9,4 +9,5 @@ sealed class AuthEvent {
     object SignOut : AuthEvent()
 
     object GoLogInByEmail : AuthEvent()
+    object GoRegisterByEmail : AuthEvent()
 }

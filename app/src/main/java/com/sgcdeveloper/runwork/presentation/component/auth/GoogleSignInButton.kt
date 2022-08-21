@@ -1,4 +1,4 @@
-package com.sgcdeveloper.runwork.presentation.component.registration
+package com.sgcdeveloper.runwork.presentation.component.auth
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.*
@@ -22,7 +22,6 @@ import com.sgcdeveloper.runwork.R
 import com.sgcdeveloper.runwork.presentation.util.google.GoogleApiContract
 import com.sgcdeveloper.runwork.presentation.theme.black
 import com.sgcdeveloper.runwork.presentation.theme.white
-import java.lang.Exception
 
 private const val GOOGLE_SIGN_IN_CANCELED = 12501
 

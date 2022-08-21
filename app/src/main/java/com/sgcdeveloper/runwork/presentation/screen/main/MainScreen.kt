@@ -19,10 +19,8 @@ import com.sgcdeveloper.runwork.presentation.screen.destinations.StartScreenDest
 @Composable
 @Destination(start = true)
 fun MainScreen(navigator: DestinationsNavigator, startViewModel: StartViewModel = hiltViewModel()) {
-    val onboardingStatus =
-        startViewModel.onboardingStatus.collectAsState(initial = OnboardingStatus.None)
 
-    when (onboardingStatus.value) {
+    when (startViewModel.onboardingStatus) {
         OnboardingStatus.START -> {
             navigator.navigate(StartScreenDestination)
         }
@@ -32,7 +30,6 @@ fun MainScreen(navigator: DestinationsNavigator, startViewModel: StartViewModel 
         OnboardingStatus.FINISH -> {
             MainScreenContent()
         }
-        OnboardingStatus.None -> Unit
     }
 }
 

@@ -4,11 +4,11 @@ import com.sgcdeveloper.runwork.data.model.core.OnboardingStatus
 import com.sgcdeveloper.runwork.domain.repository.AppRepository
 
 class AppRepositoryImpl(private val sharedPreferences: SharedPreferences) : AppRepository {
-    override suspend fun getOnboardingStatus(): OnboardingStatus {
+    override fun getOnboardingStatus(): OnboardingStatus {
         return OnboardingStatus.valueOf(sharedPreferences.getValue(ONBOARDING_STATUS, OnboardingStatus.START.name))
     }
 
-    override suspend fun setOnboardingStatus(status: OnboardingStatus) {
+    override fun setOnboardingStatus(status: OnboardingStatus) {
         sharedPreferences.putValue(ONBOARDING_STATUS, status.name)
     }
 

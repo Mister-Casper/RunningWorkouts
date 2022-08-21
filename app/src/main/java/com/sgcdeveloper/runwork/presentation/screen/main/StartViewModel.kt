@@ -12,8 +12,7 @@ import javax.inject.Inject
 @HiltViewModel
 class StartViewModel @Inject constructor(private val appRepository: AppRepository) : ViewModel() {
 
-    private val _onboardingStatus = MutableStateFlow(OnboardingStatus.START)
-    val onboardingStatus = _onboardingStatus.asStateFlow()
+    val onboardingStatus = appRepository.getOnboardingStatus()
 
     init {
 
