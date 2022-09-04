@@ -14,14 +14,20 @@
     <string name="onboarding__continue_registration">CONTINUE</string>
     <string name="onboarding__email_registration">EMAIL</string>
     <string name="onboarding__google_auth_error">Login by Google not working</string>
-    <string name="onboarding_login_email_error">"Email is not correct "</string>
-    <string name="onboarding_login_password_error">Password is too short</string>
+    <string name="onboarding__login_email_error">"Email is not correct "</string>
+    <string name="onboarding__login_password_error">Password is too short</string>
     <string name="onboarding__login_action_button">LOGIN</string>
     <string name="onboarding__password_registration">PASSWORD</string>
     <string name="onboarding__forgot_password">FORGOT PASSWORD?</string>
     <string name="onboarding__reset_password_action_button">RESET PASSWORD</string>
-    <string name="onboarding_login_invalid_email">Email is invalid</string>
-    <string name="onboarding_login_already_exist">User with this email already exists</string>
-    <string name="onboarding_password_email_sent">"A message with instructions has been sent to your email "</string>
+    <string name="onboarding__login_invalid_email">Email is invalid</string>
+    <string name="onboarding__login_already_exist">User with this email already exists</string>
+    <string name="onboarding__password_email_sent">"A message with instructions has been sent to your email "</string>
+    <string name="onboarding__first_name_registration">FIRST NAME</string>
+    <string name="onboarding__second_name_registration">SECOND NAME</string>
+    <string name="onboarding__confirm_password_registration">CONFIRM PASSWORD</string>
+    <string name="onboarding__registration_gender_male">Male</string>
+    <string name="onboarding__registration_gender_female">Female</string>
+    <string name="onboarding__registration_gender_not_said">Prefer not to say</string>
 
 </resources>

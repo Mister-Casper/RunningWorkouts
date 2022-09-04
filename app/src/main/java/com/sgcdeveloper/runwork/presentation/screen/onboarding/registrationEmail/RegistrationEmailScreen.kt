@@ -1,34 +1,28 @@
 package com.sgcdeveloper.runwork.presentation.screen.onboarding.registrationEmail
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.Animatable
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
@@ -38,7 +32,8 @@ import com.sgcdeveloper.runwork.R
 import com.sgcdeveloper.runwork.presentation.component.FullscreenImage
 import com.sgcdeveloper.runwork.presentation.component.InputField
 import com.sgcdeveloper.runwork.presentation.component.PasswordInputField
-import com.sgcdeveloper.runwork.presentation.screen.destinations.MainScreenDestination
+import com.sgcdeveloper.runwork.presentation.component.chip.ui.HorizontalOneLineChipComponent
+import com.sgcdeveloper.runwork.presentation.screen.destinations.GetStartedScreenDestination
 import com.sgcdeveloper.runwork.presentation.theme.dark_blue
 import com.sgcdeveloper.runwork.presentation.theme.dark_gray
 import com.sgcdeveloper.runwork.presentation.theme.white
@@ -48,50 +43,81 @@ import com.sgcdeveloper.runwork.presentation.util.showSuccessToast
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 @Destination
-fun RegistrationEmailScreen(navigator: DestinationsNavigator, registrationEmailViewModel: RegistrationEmailViewModel = hiltViewModel()) {
+fun RegistrationEmailScreen(
+    navigator: DestinationsNavigator,
+    registrationEmailViewModel: RegistrationEmailViewModel = hiltViewModel()
+) {
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val focusManager = LocalFocusManager.current
 
-    val screenState = registrationEmailViewModel.logInEmailScreenState.collectAsState().value
-
-    val passwordAlphaAnimation = remember { Animatable(1f) }
+    val screenState = registrationEmailViewModel.registrationEmailScreenState.collectAsState().value
 
     LaunchedEffect(Unit) {
         lifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
             registrationEmailViewModel.eventFlow.collect { event ->
                 when (event) {
-                    is RegistrationEmailViewModel.Event.LogInSuccess -> {
-                        navigator.navigate(MainScreenDestination())
-                    }
-                    RegistrationEmailViewModel.Event.GoBack -> {
-                        navigator.navigateUp()
-                    }
                     is RegistrationEmailViewModel.Event.Error -> {
                         context.shoErrorToast(event.errorInfo)
                     }
                     is RegistrationEmailViewModel.Event.Info -> {
                         context.showSuccessToast(event.infoMessage)
                     }
+                    RegistrationEmailViewModel.Event.RegistrationSuccess -> {
+                        navigator.navigate(GetStartedScreenDestination)
+                    }
                 }
             }
         }
     }
 
-    FullscreenImage(gradientColors = listOf(dark_gray, dark_gray.copy(0.7f), Color.Transparent, Color.Transparent))
+    FullscreenImage(gradientColors = listOf(dark_gray.copy(0.5f), dark_gray.copy(0.5f)))
 
     Column(Modifier.padding(start = 6.dp, end = 6.dp, top = 16.dp)) {
-        val lastFieldKeyboardAction = KeyboardActions(onDone = {
-            keyboardController?.hide()
-            focusManager.clearFocus()
-        })
-
-        val emailFieldKeyboardAction = if (screenState.loginState == RegistrationEmailViewModel.LoginState.FORGOT_PASSWORD) {
-            lastFieldKeyboardAction
-        } else
-            KeyboardActions { focusManager.moveFocus(FocusDirection.Down) }
-
+        Row(Modifier.fillMaxWidth()) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .clip(CircleShape)
+                    .background(dark_gray)
+                    .align(Alignment.CenterVertically)
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.ic_photo),
+                    contentDescription = "user icon",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                )
+            }
+            Column(Modifier.weight(2f)) {
+                InputField(
+                    label = stringResource(id = R.string.onboarding__first_name_registration),
+                    value = screenState.firstName,
+                    onValueChange = { newFirstName ->
+                        registrationEmailViewModel.onEvent(RegistrationEvent.UpdateFirstName(newFirstName))
+                    },
+                    errorText = screenState.emailError?.getString(),
+                    focusManager = focusManager,
+                )
+                InputField(
+                    label = stringResource(id = R.string.onboarding__second_name_registration),
+                    value = screenState.lastName,
+                    onValueChange = { newLastName ->
+                        registrationEmailViewModel.onEvent(RegistrationEvent.UpdateLastName(newLastName))
+                    },
+                    errorText = screenState.passwordError?.getString(),
+                    focusManager = focusManager,
+                )
+            }
+        }
+        HorizontalOneLineChipComponent(
+            chips = screenState.genderChips,
+            defaultColor = white,
+            activeChipColor = dark_blue
+        ) { registrationEmailViewModel.onEvent(RegistrationEvent.UpdateGender(it)) }
         InputField(
             label = stringResource(id = R.string.onboarding__email_registration),
             value = screenState.email,
@@ -100,79 +126,36 @@ fun RegistrationEmailScreen(navigator: DestinationsNavigator, registrationEmailV
             },
             errorText = screenState.emailError?.getString(),
             focusManager = focusManager,
-            keyboardActions = emailFieldKeyboardAction
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
         )
-        AnimatedVisibility(visible = screenState.loginState == RegistrationEmailViewModel.LoginState.LOGIN) {
-            PasswordInputField(
-                label = stringResource(id = R.string.onboarding__password_registration),
-                value = screenState.password,
-                onValueChange = { newPassword ->
-                    registrationEmailViewModel.onEvent(RegistrationEvent.UpdatePassword(newPassword))
-                },
-                errorText = screenState.passwordError?.getString(),
-                focusManager = focusManager,
-                passwordVisibility = screenState.isPasswordVisible,
-                changePasswordVisibility = {
-                    registrationEmailViewModel.onEvent(RegistrationEvent.UpdatePasswordVisibility(it))
-                },
-                modifier = Modifier
-                    .alpha(passwordAlphaAnimation.value)
-                    .padding(bottom = 16.dp),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
-                keyboardActions = lastFieldKeyboardAction
-            )
-        }
-        Column(Modifier.fillMaxWidth()) {
-            ActionButtonBlock(screenState.loginState.actionButtonText.getString()) {
-                registrationEmailViewModel.onEvent(RegistrationEvent.Action)
-            }
-            if (screenState.loginState == RegistrationEmailViewModel.LoginState.LOGIN) {
-                ForgotPasswordBlock {
-                    registrationEmailViewModel.onEvent(RegistrationEvent.ForgotPassword)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun ActionButtonBlock(actionTest: String, onClick: () -> Unit) {
-    Button(
-        onClick = { onClick() },
-        shape = RoundedCornerShape(24.dp),
-        colors = ButtonDefaults.buttonColors(
-            backgroundColor = dark_blue.copy(alpha = 0.8f),
-            contentColor = white
-        ),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 16.dp)
-    ) {
-        Text(
-            text = actionTest,
-            modifier = Modifier.padding(top = 6.dp, bottom = 6.dp),
-            fontSize = 16.sp,
-            fontWeight = FontWeight.ExtraBold
+        PasswordInputField(
+            label = stringResource(id = R.string.onboarding__password_registration),
+            value = screenState.password,
+            onValueChange = { newPassword ->
+                registrationEmailViewModel.onEvent(RegistrationEvent.UpdatePassword(newPassword))
+            },
+            errorText = screenState.passwordError?.getString(),
+            focusManager = focusManager,
+            passwordVisibility = screenState.isPasswordVisible,
+            changePasswordVisibility = {
+                registrationEmailViewModel.onEvent(RegistrationEvent.UpdatePasswordVisibility(it))
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         )
-    }
-}
-
-@Composable
-private fun ForgotPasswordBlock(onClick: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .padding(start = 8.dp, top = 16.dp)
-            .clickable {
-                onClick()
-            }
-    ) {
-        Text(
-            text = stringResource(id = R.string.onboarding__forgot_password),
-            modifier = Modifier
-                .padding(top = 6.dp, end = 6.dp, start = 6.dp, bottom = 6.dp),
-            fontSize = 16.sp,
-            fontWeight = FontWeight.ExtraBold,
-            color = white
+        PasswordInputField(
+            label = stringResource(id = R.string.onboarding__confirm_password_registration),
+            value = screenState.confirmPassword,
+            onValueChange = { newPassword ->
+                registrationEmailViewModel.onEvent(RegistrationEvent.UpdateConfirmPassword(newPassword))
+            },
+            errorText = screenState.passwordError?.getString(),
+            focusManager = focusManager,
+            passwordVisibility = screenState.isPasswordVisible,
+            changePasswordVisibility = {
+                registrationEmailViewModel.onEvent(RegistrationEvent.UpdatePasswordVisibility(it))
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() })
         )
     }
 }

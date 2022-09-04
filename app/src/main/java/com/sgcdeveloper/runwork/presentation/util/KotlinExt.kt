@@ -9,13 +9,13 @@ import com.sgcdeveloper.runwork.presentation.util.TextContainer.Companion.getTex
 fun Throwable.getAuthErrorInfo(): TextContainer {
     return when (this) {
         is FirebaseAuthWeakPasswordException -> {
-            getTextContainer(R.string.onboarding_login_password_error)
+            getTextContainer(R.string.onboarding__login_password_error)
         }
         is FirebaseAuthInvalidCredentialsException -> {
-            getTextContainer(R.string.onboarding_login_invalid_email)
+            getTextContainer(R.string.onboarding__login_invalid_email)
         }
         is FirebaseAuthUserCollisionException -> {
-            getTextContainer(R.string.onboarding_login_already_exist)
+            getTextContainer(R.string.onboarding__login_already_exist)
         }
         else -> {
             TextContainer.StringTextContainer(this.localizedMessage.orEmpty())

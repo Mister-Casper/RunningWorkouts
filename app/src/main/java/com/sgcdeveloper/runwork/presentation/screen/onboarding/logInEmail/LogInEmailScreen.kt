@@ -102,7 +102,8 @@ fun LogInEmailScreen(navigator: DestinationsNavigator, logInEmailViewModel: LogI
             },
             errorText = screenState.emailError?.getString(),
             focusManager = focusManager,
-            keyboardActions = emailFieldKeyboardAction
+            keyboardActions = emailFieldKeyboardAction,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
         )
         AnimatedVisibility(visible = screenState.loginState == LogInEmailViewModel.LoginState.LOGIN) {
             PasswordInputField(

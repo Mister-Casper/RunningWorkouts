@@ -2,14 +2,13 @@ package com.sgcdeveloper.runwork.presentation.screen.onboarding.registrationEmai
 
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
-import com.sgcdeveloper.runwork.R
 import com.sgcdeveloper.runwork.domain.validators.EmailValidator
 import com.sgcdeveloper.runwork.domain.validators.PasswordValidator
+import com.sgcdeveloper.runwork.domain.validators.UserNameValidator
+import com.sgcdeveloper.runwork.presentation.component.chip.model.GenderChipModel
+import com.sgcdeveloper.runwork.presentation.component.chip.controller.OneActiveItemChipsController
 import com.sgcdeveloper.runwork.presentation.util.TextContainer
-import com.sgcdeveloper.runwork.presentation.util.TextContainer.Companion.getTextContainer
-import com.sgcdeveloper.runwork.presentation.util.getAuthErrorInfo
-import com.sgcdeveloper.runwork.presentation.util.observe
-import com.sgcdeveloper.runwork.presentation.util.sendEvent
+import com.sgcdeveloper.runwork.presentation.util.userGenderChips
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -19,168 +18,127 @@ import javax.inject.Inject
 class RegistrationEmailViewModel @Inject constructor(
     private val emailValidator: EmailValidator,
     private val passwordValidator: PasswordValidator,
+    private val userNameValidator: UserNameValidator,
     private val firebaseAuth: FirebaseAuth
 ) : ViewModel() {
 
-    private val _logInEmailScreenState = MutableStateFlow(LogInScreenState())
-    val logInEmailScreenState = _logInEmailScreenState.asStateFlow()
+    private val _registrationEmailScreenState = MutableStateFlow(LogInScreenState())
+    val registrationEmailScreenState = _registrationEmailScreenState.asStateFlow()
 
     private val _eventChannel = Channel<Event>(Channel.BUFFERED)
     val eventFlow = _eventChannel.receiveAsFlow()
 
-    fun onEvent(registrationEvent: RegistrationEvent) {
-        when (registrationEvent) {
+    private val genderChipsController = OneActiveItemChipsController(_registrationEmailScreenState.value.genderChips)
+
+    fun onEvent(event: RegistrationEvent) {
+        when (event) {
+            RegistrationEvent.Next -> {
+                doRegistration()
+            }
             is RegistrationEvent.UpdateEmail -> {
-                updateEmail(registrationEvent.email)
+                updateEmail(event.email)
+            }
+            is RegistrationEvent.UpdateFirstName -> {
+                updateFirstName(event.firstName)
+            }
+            is RegistrationEvent.UpdateLastName -> {
+                updateLastName(event.lastName)
             }
             is RegistrationEvent.UpdatePassword -> {
-                updatePassword(registrationEvent.password)
+                updatePassword(event.password)
+            }
+            is RegistrationEvent.UpdateConfirmPassword -> {
+                updateConfirmPassword(event.password)
+            }
+            is RegistrationEvent.UpdateGender -> {
+                updateSex(event.genderChip)
             }
             is RegistrationEvent.UpdatePasswordVisibility -> {
-                changePasswordVisibility(registrationEvent.isVisible)
-            }
-            RegistrationEvent.Action -> {
-                doAction()
-            }
-            RegistrationEvent.ForgotPassword -> {
-                goToForgotPasswordScreen()
-            }
-            RegistrationEvent.BackPressed -> {
-                onBackPressed()
+                updatePasswordVisibility(event.isVisible)
             }
         }
+    }
+
+    private fun updatePasswordVisibility(newIsVisible: Boolean) {
+        _registrationEmailScreenState.update { it.copy(isPasswordVisible = newIsVisible) }
+    }
+
+    private fun updateLastName(newLastName: String) {
+        _registrationEmailScreenState.update { it.copy(lastName = newLastName, firstNameError = null) }
+    }
+
+    private fun updateFirstName(newFirstName: String) {
+        _registrationEmailScreenState.update { it.copy(firstName = newFirstName, firstNameError = null) }
     }
 
     private fun updateEmail(newEmail: String) {
-        _logInEmailScreenState.update { it.copy(email = newEmail, emailError = null) }
+        _registrationEmailScreenState.update { it.copy(email = newEmail, emailError = null) }
     }
 
     private fun updatePassword(newPassword: String) {
-        _logInEmailScreenState.update { it.copy(password = newPassword, passwordError = null) }
+        _registrationEmailScreenState.update { it.copy(password = newPassword, passwordError = null) }
     }
 
-    private fun doAction() {
-        when (_logInEmailScreenState.value.loginState) {
-            LoginState.LOGIN -> {
-                doLogInAction()
-            }
-            LoginState.FORGOT_PASSWORD -> {
-                doForgotPasswordAction()
-            }
-        }
-    }
-
-    private fun doLogInAction() {
-        val isEmailValid = emailValidator.isValid(_logInEmailScreenState.value.email)
-        val isPasswordValid = passwordValidator.isValid(_logInEmailScreenState.value.password)
-        when {
-            !isEmailValid -> {
-                showEmailError()
-            }
-            !isPasswordValid -> {
-                showPasswordError()
-            }
-            else -> {
-                tryToLogIn()
-            }
-        }
-    }
-
-    private fun tryToLogIn() {
-        firebaseAuth.signInWithEmailAndPassword(
-            _logInEmailScreenState.value.email,
-            _logInEmailScreenState.value.password
-        ).observe(onSuccess = {
-            sendEvent(_eventChannel, Event.LogInSuccess)
-        }, onFailure = {
-            sendEvent(_eventChannel, Event.Error(it.getAuthErrorInfo()))
-        })
-    }
-
-    private fun doForgotPasswordAction() {
-        when (emailValidator.isValid(_logInEmailScreenState.value.email)) {
-            true -> {
-                doSendForgotPasswordEmail()
-            }
-            false -> {
-                showEmailError()
-            }
-        }
-    }
-
-    private fun doSendForgotPasswordEmail() {
-        firebaseAuth.sendPasswordResetEmail(
-            _logInEmailScreenState.value.email
-        ).observe(onSuccess = {
-            goToLogInEmailScreen()
-            sendEvent(_eventChannel, Event.Info(getTextContainer(R.string.onboarding_password_email_sent)))
-        }, onFailure = {
-            sendEvent(_eventChannel, Event.Error(it.getAuthErrorInfo()))
-        })
-    }
-
-    private fun showEmailError() {
-        _logInEmailScreenState.update { it.copy(emailError = getTextContainer(R.string.onboarding_login_email_error)) }
-    }
-
-    private fun showPasswordError() {
-        _logInEmailScreenState.update { it.copy(passwordError = getTextContainer(R.string.onboarding_login_password_error)) }
-    }
-
-    private fun goToForgotPasswordScreen() {
-        _logInEmailScreenState.update {
+    private fun updateConfirmPassword(newConfirmPassword: String) {
+        _registrationEmailScreenState.update {
             it.copy(
-                loginState = LoginState.FORGOT_PASSWORD,
-                emailError = null,
-                passwordError = null
+                confirmPassword = newConfirmPassword,
+                confirmPasswordError = null
             )
         }
     }
 
-    private fun goToLogInEmailScreen() {
-        _logInEmailScreenState.update {
-            it.copy(
-                loginState = LoginState.LOGIN,
-                emailError = null,
-                passwordError = null
-            )
-        }
+    private fun updateSex(genderChip: GenderChipModel) {
+        genderChipsController.onChipClick(genderChip)
+        _registrationEmailScreenState.update { it.copy(genderChips = genderChipsController.getAllChips()) }
     }
 
-    private fun onBackPressed() {
-        when (_logInEmailScreenState.value.loginState) {
-            LoginState.LOGIN -> {
-                sendEvent(_eventChannel, Event.GoBack)
-            }
-            LoginState.FORGOT_PASSWORD -> {
-                goToLogInEmailScreen()
+    private fun doRegistration() {
+        with(_registrationEmailScreenState.value) {
+            val isEmailValid = emailValidator.isValid(email)
+            val isPasswordValid = passwordValidator.isValid(password)
+            val isFirstNameValid = userNameValidator.isValid(firstName)
+            val isLastNameValid = userNameValidator.isValid(lastName)
+            when {
+                !isFirstNameValid -> {
+
+                }
+                !isLastNameValid -> {
+
+                }
+                !isEmailValid -> {
+
+                }
+                !isPasswordValid -> {
+
+                }
+                else -> {
+
+                }
             }
         }
-    }
-
-    private fun changePasswordVisibility(isPasswordVisible: Boolean) {
-        _logInEmailScreenState.update { it.copy(isPasswordVisible = isPasswordVisible) }
     }
 
     data class LogInScreenState(
-        val loginState: LoginState = LoginState.LOGIN,
+        val userIconPath: String? = null,
         val email: String = "",
-        val password: String = "",
-        val isPasswordVisible: Boolean = false,
         val emailError: TextContainer? = null,
+        val password: String = "",
         val passwordError: TextContainer? = null,
+        val confirmPassword: String = "",
+        val confirmPasswordError: TextContainer? = null,
+        val isPasswordVisible: Boolean = false,
+        val firstName: String = "",
+        val firstNameError: TextContainer? = null,
+        val lastName: String = "",
+        val lastNameError: TextContainer? = null,
+        val genderChips: List<GenderChipModel> = userGenderChips
     )
-
-    enum class LoginState(val actionButtonText: TextContainer) {
-        LOGIN(getTextContainer(R.string.onboarding__login_action_button)),
-        FORGOT_PASSWORD(getTextContainer(R.string.onboarding__reset_password_action_button))
-    }
 
     sealed class Event {
         data class Info(val infoMessage: TextContainer) : Event()
         data class Error(val errorInfo: TextContainer) : Event()
 
-        object GoBack : Event()
-        object LogInSuccess : Event()
+        object RegistrationSuccess : Event()
     }
 }

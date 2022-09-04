@@ -122,18 +122,18 @@ class LogInEmailViewModel @Inject constructor(
             _logInEmailScreenState.value.email
         ).observe(onSuccess = {
             goToLogInEmailScreen()
-            sendEvent(_eventChannel, Event.Info(getTextContainer(R.string.onboarding_password_email_sent)))
+            sendEvent(_eventChannel, Event.Info(getTextContainer(R.string.onboarding__password_email_sent)))
         }, onFailure = {
             sendEvent(_eventChannel, Event.Error(it.getAuthErrorInfo()))
         })
     }
 
     private fun showEmailError() {
-        _logInEmailScreenState.update { it.copy(emailError = getTextContainer(R.string.onboarding_login_email_error)) }
+        _logInEmailScreenState.update { it.copy(emailError = getTextContainer(R.string.onboarding__login_email_error)) }
     }
 
     private fun showPasswordError() {
-        _logInEmailScreenState.update { it.copy(passwordError = getTextContainer(R.string.onboarding_login_password_error)) }
+        _logInEmailScreenState.update { it.copy(passwordError = getTextContainer(R.string.onboarding__login_password_error)) }
     }
 
     private fun goToForgotPasswordScreen() {

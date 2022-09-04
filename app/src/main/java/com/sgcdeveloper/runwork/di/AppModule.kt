@@ -58,7 +58,7 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideFirebaseAuth(@ApplicationContext context: Context): FirebaseAuth {
+    fun provideFirebaseAuth(): FirebaseAuth {
         return FirebaseAuth.getInstance()
     }
 }
