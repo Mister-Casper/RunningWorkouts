@@ -3,8 +3,6 @@ package com.sgcdeveloper.runwork.presentation.screen.onboarding.logInEmail
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationVector1D
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,7 +12,6 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -22,7 +19,6 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -31,55 +27,28 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.repeatOnLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.sgcdeveloper.runwork.R
 import com.sgcdeveloper.runwork.presentation.component.FullscreenImage
 import com.sgcdeveloper.runwork.presentation.component.InputField
 import com.sgcdeveloper.runwork.presentation.component.PasswordInputField
-import com.sgcdeveloper.runwork.presentation.screen.destinations.MainScreenDestination
+import com.sgcdeveloper.runwork.presentation.navigation.NavigationEventsHandler
 import com.sgcdeveloper.runwork.presentation.theme.dark_blue
 import com.sgcdeveloper.runwork.presentation.theme.dark_gray
 import com.sgcdeveloper.runwork.presentation.theme.white
 import com.sgcdeveloper.runwork.presentation.util.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 @Destination
-fun LogInEmailScreen(navigator: DestinationsNavigator, logInEmailViewModel: LogInEmailViewModel = hiltViewModel()) {
-    val context = LocalContext.current
+fun LogInEmailScreen(logInEmailViewModel: LogInEmailViewModel = navigableHiltViewModel()) {
     val keyboardController = LocalSoftwareKeyboardController.current
-    val lifecycleOwner = LocalLifecycleOwner.current
     val focusManager = LocalFocusManager.current
 
     val screenState = logInEmailViewModel.logInEmailScreenState.collectAsState().value
 
     val passwordAlphaAnimation = remember { Animatable(1f) }
-
-    LaunchedEffect(Unit) {
-        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
-            logInEmailViewModel.eventFlow.collect { event ->
-                when (event) {
-                    is LogInEmailViewModel.Event.LogInSuccess -> {
-                        navigator.navigate(MainScreenDestination())
-                    }
-                    LogInEmailViewModel.Event.GoBack -> {
-                        navigator.navigateUp()
-                    }
-                    is LogInEmailViewModel.Event.Error -> {
-                        context.shoErrorToast(event.errorInfo)
-                    }
-                    is LogInEmailViewModel.Event.Info -> {
-                        context.showSuccessToast(event.infoMessage)
-                    }
-                }
-            }
-        }
-    }
 
     FullscreenImage(gradientColors = listOf(dark_gray, dark_gray.copy(0.7f), Color.Transparent, Color.Transparent))
 

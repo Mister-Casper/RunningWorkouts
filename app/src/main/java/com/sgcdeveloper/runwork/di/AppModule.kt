@@ -3,6 +3,7 @@ package com.sgcdeveloper.runwork.di
 import android.content.Context
 import androidx.room.Room
 import com.google.firebase.auth.FirebaseAuth
+import com.ramcosta.composedestinations.navigation.DestinationsNavController
 import com.sgcdeveloper.runwork.core.DefaultDispatchersProvider
 import com.sgcdeveloper.runwork.core.DispatchersProvider
 import com.sgcdeveloper.runwork.data.AppDatabase
@@ -11,6 +12,7 @@ import com.sgcdeveloper.runwork.data.repository.SharedPreferences
 import com.sgcdeveloper.runwork.data.repository.WorkoutRepositoryImpl
 import com.sgcdeveloper.runwork.domain.repository.AppRepository
 import com.sgcdeveloper.runwork.domain.repository.WorkoutRepository
+import com.sgcdeveloper.runwork.presentation.navigation.NavigationEventsHandler
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -60,5 +62,11 @@ object AppModule {
     @Provides
     fun provideFirebaseAuth(): FirebaseAuth {
         return FirebaseAuth.getInstance()
+    }
+
+    @Singleton
+    @Provides
+    fun provideNavigationEventsHandler(@ApplicationContext context: Context): NavigationEventsHandler {
+        return NavigationEventsHandler(context)
     }
 }

@@ -1,21 +1,23 @@
 package com.sgcdeveloper.runwork.presentation.screen.onboarding.logInEmail
 
-import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.sgcdeveloper.runwork.R
 import com.sgcdeveloper.runwork.data.model.core.OnboardingStatus
 import com.sgcdeveloper.runwork.domain.repository.AppRepository
 import com.sgcdeveloper.runwork.domain.validators.EmailValidator
 import com.sgcdeveloper.runwork.domain.validators.PasswordValidator
+import com.sgcdeveloper.runwork.presentation.navigation.NavigableViewModel
+import com.sgcdeveloper.runwork.presentation.navigation.NavigationEvent
+import com.sgcdeveloper.runwork.presentation.navigation.NavigationEventsHandler
+import com.sgcdeveloper.runwork.presentation.screen.destinations.MainScreenDestination
 import com.sgcdeveloper.runwork.presentation.util.TextContainer
 import com.sgcdeveloper.runwork.presentation.util.TextContainer.Companion.getTextContainer
 import com.sgcdeveloper.runwork.presentation.util.getAuthErrorInfo
 import com.sgcdeveloper.runwork.presentation.util.observe
-import com.sgcdeveloper.runwork.presentation.util.sendEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.*
-import java.lang.Exception
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,14 +25,12 @@ class LogInEmailViewModel @Inject constructor(
     private val emailValidator: EmailValidator,
     private val passwordValidator: PasswordValidator,
     private val firebaseAuth: FirebaseAuth,
-    private val appRepository: AppRepository
-) : ViewModel() {
+    private val appRepository: AppRepository,
+    navigationEventsHandler: NavigationEventsHandler,
+) : NavigableViewModel(navigationEventsHandler) {
 
     private val _logInEmailScreenState = MutableStateFlow(LogInScreenState())
     val logInEmailScreenState = _logInEmailScreenState.asStateFlow()
-
-    private val _eventChannel = Channel<Event>(Channel.BUFFERED)
-    val eventFlow = _eventChannel.receiveAsFlow()
 
     fun onEvent(logInEvent: LogInEvent) {
         when (logInEvent) {
@@ -99,11 +99,11 @@ class LogInEmailViewModel @Inject constructor(
 
     private fun logIn() {
         appRepository.setOnboardingStatus(OnboardingStatus.FINISH)
-        sendEvent(_eventChannel, Event.LogInSuccess)
+        sendEvent(NavigationEvent.NavigateTo(MainScreenDestination))
     }
 
     private fun logInFailed(exception: Exception) {
-        sendEvent(_eventChannel, Event.Error(exception.getAuthErrorInfo()))
+        sendEvent(NavigationEvent.ShowErrorMassage(exception.getAuthErrorInfo()))
     }
 
     private fun doForgotPasswordAction() {
@@ -122,9 +122,9 @@ class LogInEmailViewModel @Inject constructor(
             _logInEmailScreenState.value.email
         ).observe(onSuccess = {
             goToLogInEmailScreen()
-            sendEvent(_eventChannel, Event.Info(getTextContainer(R.string.onboarding__password_email_sent)))
+            sendEvent(NavigationEvent.ShowInfoMassage(getTextContainer(R.string.onboarding__password_email_sent)))
         }, onFailure = {
-            sendEvent(_eventChannel, Event.Error(it.getAuthErrorInfo()))
+            sendEvent(NavigationEvent.ShowErrorMassage(it.getAuthErrorInfo()))
         })
     }
 
@@ -159,7 +159,7 @@ class LogInEmailViewModel @Inject constructor(
     private fun onBackPressed() {
         when (_logInEmailScreenState.value.loginState) {
             LoginState.LOGIN -> {
-                sendEvent(_eventChannel, Event.GoBack)
+                sendEvent(NavigationEvent.GoBack)
             }
             LoginState.FORGOT_PASSWORD -> {
                 goToLogInEmailScreen()
@@ -183,13 +183,5 @@ class LogInEmailViewModel @Inject constructor(
     enum class LoginState(val actionButtonText: TextContainer) {
         LOGIN(getTextContainer(R.string.onboarding__login_action_button)),
         FORGOT_PASSWORD(getTextContainer(R.string.onboarding__reset_password_action_button))
-    }
-
-    sealed class Event {
-        data class Info(val infoMessage: TextContainer) : Event()
-        data class Error(val errorInfo: TextContainer) : Event()
-
-        object GoBack : Event()
-        object LogInSuccess : Event()
     }
 }

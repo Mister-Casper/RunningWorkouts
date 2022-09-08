@@ -1,14 +1,23 @@
 package com.sgcdeveloper.runwork.presentation.util
 
 import android.content.Context
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.HiltViewModelFactory
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.tasks.Task
+import com.ramcosta.composedestinations.navigation.DestinationsNavController
+import com.sgcdeveloper.runwork.presentation.navigation.NavigableViewModel
 import es.dmoral.toasty.Toasty
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import java.lang.Exception
 
 fun Context.shoErrorToast(text: TextContainer) {
     Toasty.error(
@@ -41,4 +50,31 @@ fun <T> Task<T>.observe(onSuccess: (result: T) -> Unit, onFailure: (exception: E
     addOnFailureListener {
         onFailure(it)
     }
+}
+
+@Composable
+inline fun <reified VM : NavigableViewModel> navigableHiltViewModel(
+    viewModelStoreOwner: ViewModelStoreOwner = checkNotNull(LocalViewModelStoreOwner.current) {
+        "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
+    }
+): VM {
+    val factory = createHiltViewModelFactory(viewModelStoreOwner)
+    val viewModel = viewModel(viewModelStoreOwner, factory = factory) as VM
+    viewModel.setNavigator(DestinationsNavController(rememberNavController(), viewModelStoreOwner as NavBackStackEntry))
+    return viewModel(viewModelStoreOwner, factory = factory)
+}
+
+@Composable
+@PublishedApi
+internal fun createHiltViewModelFactory(
+    viewModelStoreOwner: ViewModelStoreOwner
+): ViewModelProvider.Factory? = if (viewModelStoreOwner is NavBackStackEntry) {
+    HiltViewModelFactory(
+        context = LocalContext.current,
+        navBackStackEntry = viewModelStoreOwner
+    )
+} else {
+    // Use the default factory provided by the ViewModelStoreOwner
+    // and assume it is an @AndroidEntryPoint annotated fragment or activity
+    null
 }
