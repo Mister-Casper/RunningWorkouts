@@ -37,40 +37,18 @@ import com.sgcdeveloper.runwork.presentation.screen.destinations.GetStartedScree
 import com.sgcdeveloper.runwork.presentation.theme.dark_blue
 import com.sgcdeveloper.runwork.presentation.theme.dark_gray
 import com.sgcdeveloper.runwork.presentation.theme.white
+import com.sgcdeveloper.runwork.presentation.util.navigableHiltViewModel
 import com.sgcdeveloper.runwork.presentation.util.shoErrorToast
 import com.sgcdeveloper.runwork.presentation.util.showSuccessToast
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 @Destination
-fun RegistrationEmailScreen(
-    navigator: DestinationsNavigator,
-    registrationEmailViewModel: RegistrationEmailViewModel = hiltViewModel()
-) {
-    val context = LocalContext.current
+fun RegistrationEmailScreen(registrationEmailViewModel: RegistrationEmailViewModel = navigableHiltViewModel()) {
     val keyboardController = LocalSoftwareKeyboardController.current
-    val lifecycleOwner = LocalLifecycleOwner.current
     val focusManager = LocalFocusManager.current
 
     val screenState = registrationEmailViewModel.registrationEmailScreenState.collectAsState().value
-
-    LaunchedEffect(Unit) {
-        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
-            registrationEmailViewModel.eventFlow.collect { event ->
-                when (event) {
-                    is RegistrationEmailViewModel.Event.Error -> {
-                        context.shoErrorToast(event.errorInfo)
-                    }
-                    is RegistrationEmailViewModel.Event.Info -> {
-                        context.showSuccessToast(event.infoMessage)
-                    }
-                    RegistrationEmailViewModel.Event.RegistrationSuccess -> {
-                        navigator.navigate(GetStartedScreenDestination)
-                    }
-                }
-            }
-        }
-    }
 
     FullscreenImage(gradientColors = listOf(dark_gray.copy(0.5f), dark_gray.copy(0.5f)))
 

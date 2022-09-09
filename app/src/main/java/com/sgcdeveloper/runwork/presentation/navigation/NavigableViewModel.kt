@@ -18,16 +18,17 @@ open class NavigableViewModel @Inject constructor(
     private var _destinationsNavigator: DestinationsNavigator? = null
 
     private val _navigationEventsChannel = Channel<NavigationEvent>(Channel.BUFFERED)
-    private val navigationEventsChannel = _navigationEventsChannel.receiveAsFlow()
 
     init {
         viewModelScope.launch {
-            navigationEventsChannel.collectLatest { event ->
-                navigationEventsHandler.handle(
-                    navigationEvent = event,
-                    navigator = _destinationsNavigator ?: throw Exception("You should use navigableHiltViewModel() to provide your view model")
-                )
-            }
+            _navigationEventsChannel.receiveAsFlow()
+                .collectLatest { event ->
+                    navigationEventsHandler.handle(
+                        navigationEvent = event,
+                        navigator = _destinationsNavigator
+                            ?: throw Exception("You should use navigableHiltViewModel() to provide your view model")
+                    )
+                }
         }
     }
 

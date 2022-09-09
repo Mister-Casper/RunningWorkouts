@@ -1,16 +1,16 @@
 package com.sgcdeveloper.runwork.presentation.screen.onboarding.registrationEmail
 
-import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.sgcdeveloper.runwork.domain.validators.EmailValidator
 import com.sgcdeveloper.runwork.domain.validators.PasswordValidator
 import com.sgcdeveloper.runwork.domain.validators.UserNameValidator
 import com.sgcdeveloper.runwork.presentation.component.chip.model.GenderChipModel
 import com.sgcdeveloper.runwork.presentation.component.chip.controller.OneActiveItemChipsController
+import com.sgcdeveloper.runwork.presentation.navigation.NavigableViewModel
+import com.sgcdeveloper.runwork.presentation.navigation.NavigationEventsHandler
 import com.sgcdeveloper.runwork.presentation.util.TextContainer
 import com.sgcdeveloper.runwork.presentation.util.userGenderChips
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
@@ -19,14 +19,12 @@ class RegistrationEmailViewModel @Inject constructor(
     private val emailValidator: EmailValidator,
     private val passwordValidator: PasswordValidator,
     private val userNameValidator: UserNameValidator,
-    private val firebaseAuth: FirebaseAuth
-) : ViewModel() {
+    private val firebaseAuth: FirebaseAuth,
+    navigationEventsHandler: NavigationEventsHandler
+) : NavigableViewModel(navigationEventsHandler) {
 
     private val _registrationEmailScreenState = MutableStateFlow(LogInScreenState())
     val registrationEmailScreenState = _registrationEmailScreenState.asStateFlow()
-
-    private val _eventChannel = Channel<Event>(Channel.BUFFERED)
-    val eventFlow = _eventChannel.receiveAsFlow()
 
     private val genderChipsController = OneActiveItemChipsController(_registrationEmailScreenState.value.genderChips)
 
@@ -134,11 +132,4 @@ class RegistrationEmailViewModel @Inject constructor(
         val lastNameError: TextContainer? = null,
         val genderChips: List<GenderChipModel> = userGenderChips
     )
-
-    sealed class Event {
-        data class Info(val infoMessage: TextContainer) : Event()
-        data class Error(val errorInfo: TextContainer) : Event()
-
-        object RegistrationSuccess : Event()
-    }
 }
