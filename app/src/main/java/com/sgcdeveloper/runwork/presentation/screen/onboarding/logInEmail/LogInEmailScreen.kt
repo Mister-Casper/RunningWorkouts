@@ -5,11 +5,8 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -17,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -26,15 +22,13 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.sgcdeveloper.runwork.R
+import com.sgcdeveloper.runwork.presentation.component.ActionButtonBlock
 import com.sgcdeveloper.runwork.presentation.component.FullscreenImage
 import com.sgcdeveloper.runwork.presentation.component.InputField
 import com.sgcdeveloper.runwork.presentation.component.PasswordInputField
-import com.sgcdeveloper.runwork.presentation.navigation.NavigationEventsHandler
-import com.sgcdeveloper.runwork.presentation.theme.dark_blue
 import com.sgcdeveloper.runwork.presentation.theme.dark_gray
 import com.sgcdeveloper.runwork.presentation.theme.white
 import com.sgcdeveloper.runwork.presentation.util.*
@@ -42,7 +36,12 @@ import com.sgcdeveloper.runwork.presentation.util.*
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 @Destination
-fun LogInEmailScreen(logInEmailViewModel: LogInEmailViewModel = navigableHiltViewModel()) {
+fun LogInEmailScreen(
+    navigator: DestinationsNavigator,
+    logInEmailViewModel: LogInEmailViewModel = navigableHiltViewModel()
+) {
+    logInEmailViewModel.setNavigator(navigator)
+
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
 
@@ -95,7 +94,10 @@ fun LogInEmailScreen(logInEmailViewModel: LogInEmailViewModel = navigableHiltVie
             )
         }
         Column(Modifier.fillMaxWidth()) {
-            ActionButtonBlock(screenState.loginState.actionButtonText.getString()) {
+            ActionButtonBlock(
+                modifier = Modifier.padding(start = 12.dp, end = 12.dp, top = 16.dp),
+                actionTest = screenState.loginState.actionButtonText.getString()
+            ) {
                 logInEmailViewModel.onEvent(LogInEvent.Action)
             }
             if (screenState.loginState == LogInEmailViewModel.LoginState.LOGIN) {
@@ -108,28 +110,6 @@ fun LogInEmailScreen(logInEmailViewModel: LogInEmailViewModel = navigableHiltVie
 
     BackHandler {
         logInEmailViewModel.onEvent(LogInEvent.BackPressed)
-    }
-}
-
-@Composable
-private fun ActionButtonBlock(actionTest: String, onClick: () -> Unit) {
-    Button(
-        onClick = { onClick() },
-        shape = RoundedCornerShape(24.dp),
-        colors = ButtonDefaults.buttonColors(
-            backgroundColor = dark_blue.copy(alpha = 0.8f),
-            contentColor = white
-        ),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 16.dp)
-    ) {
-        Text(
-            text = actionTest,
-            modifier = Modifier.padding(top = 6.dp, bottom = 6.dp),
-            fontSize = 16.sp,
-            fontWeight = FontWeight.ExtraBold
-        )
     }
 }
 

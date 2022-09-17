@@ -3,12 +3,11 @@ package com.sgcdeveloper.runwork.di
 import android.content.Context
 import androidx.room.Room
 import com.google.firebase.auth.FirebaseAuth
-import com.ramcosta.composedestinations.navigation.DestinationsNavController
 import com.sgcdeveloper.runwork.core.DefaultDispatchersProvider
 import com.sgcdeveloper.runwork.core.DispatchersProvider
 import com.sgcdeveloper.runwork.data.AppDatabase
 import com.sgcdeveloper.runwork.data.repository.AppRepositoryImpl
-import com.sgcdeveloper.runwork.data.repository.SharedPreferences
+import com.sgcdeveloper.runwork.data.repository.SharedPreferencesStore
 import com.sgcdeveloper.runwork.data.repository.WorkoutRepositoryImpl
 import com.sgcdeveloper.runwork.domain.repository.AppRepository
 import com.sgcdeveloper.runwork.domain.repository.WorkoutRepository
@@ -48,14 +47,14 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideAppRepository(sharedPreferences: SharedPreferences): AppRepository {
-        return AppRepositoryImpl(sharedPreferences)
+    fun provideAppRepository(sharedPreferencesStore: SharedPreferencesStore): AppRepository {
+        return AppRepositoryImpl(sharedPreferencesStore)
     }
 
     @Singleton
     @Provides
-    fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
-        return SharedPreferences(context)
+    fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferencesStore {
+        return SharedPreferencesStore(context)
     }
 
     @Singleton

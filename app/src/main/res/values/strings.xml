@@ -29,5 +29,8 @@
     <string name="onboarding__registration_gender_male">Male</string>
     <string name="onboarding__registration_gender_female">Female</string>
     <string name="onboarding__registration_gender_not_said">Prefer not to say</string>
+    <string name="onboarding__registration_action_button">JOIN</string>
+    <string name="onboarding__registration_name_error">This field can\'t be empty</string>
+    <string name="onboarding__registration_confirm_password_error">"Passwords do not match "</string>
 
 </resources>

@@ -2,21 +2,20 @@ package com.sgcdeveloper.runwork.presentation.component.chip.controller
 
 import com.sgcdeveloper.runwork.presentation.component.chip.model.ChipModel
 
-abstract class ChipsController<T : ChipModel>(chips: List<T>) {
+abstract class ChipsController(chips: List<ChipModel>) {
 
-    abstract fun onChipClick(chip: T)
+    abstract fun onChipClick(chip: ChipModel)
 
-    protected val chips:MutableList<T> = chips.toMutableList()
+    protected val chips: MutableList<ChipModel> = chips.toMutableList()
 
-    fun getAllChips(): List<T> = chips
+    fun getAllChips(): List<ChipModel> = chips.toList()
 
     fun deactivateAllChips() {
-        val clearedChips = chips.map { it.copy(isActive = false) } as List<T>
-        chips.clear()
-        chips.addAll(clearedChips)
+        val clearedChips = chips.map { it.copy(isActive = false) }
+        updateChips(clearedChips)
     }
 
-    protected fun updateChips(chips: List<T>) {
+    protected fun updateChips(chips: List<ChipModel>) {
         this.chips.clear()
         this.chips.addAll(chips)
     }

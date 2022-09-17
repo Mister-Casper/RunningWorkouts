@@ -2,14 +2,18 @@ package com.sgcdeveloper.runwork.presentation.component.chip.controller
 
 import com.sgcdeveloper.runwork.presentation.component.chip.model.ChipModel
 
-class OneActiveItemChipsController<T : ChipModel>(chips: List<T>) : ChipsController<T>(chips) {
+class OneActiveItemChipsController(chips: List<ChipModel>) : ChipsController(chips) {
 
-    override fun onChipClick(chip: T) {
+    override fun onChipClick(chip: ChipModel) {
         deactivateAllChips()
         updateChipActiveState(chip)
     }
 
-    private fun updateChipActiveState(chip: T) {
-        updateChips(chips.map { item -> chip.copy(isActive = (item.id == chip.id)) } as List<T>)
+    fun getActiveChipOrNull(): ChipModel? {
+        return chips.find { it.isActive }
+    }
+
+    private fun updateChipActiveState(chip: ChipModel) {
+        updateChips(chips.map { item -> item.copy(isActive = (item.id == chip.id)) })
     }
 }

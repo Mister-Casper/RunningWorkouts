@@ -7,7 +7,7 @@ import com.sgcdeveloper.runwork.presentation.util.TextContainer
 import com.sgcdeveloper.runwork.presentation.util.shoErrorToast
 import com.sgcdeveloper.runwork.presentation.util.showSuccessToast
 
-sealed class NavigationEvent {
+abstract class NavigationEvent {
     abstract fun execute(context: Context, navigator: DestinationsNavigator)
 
     open class ShowErrorMassage(private val messageText: TextContainer) : NavigationEvent() {

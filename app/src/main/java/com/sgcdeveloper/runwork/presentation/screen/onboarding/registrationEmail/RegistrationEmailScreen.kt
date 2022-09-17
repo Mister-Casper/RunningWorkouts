@@ -7,39 +7,29 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.repeatOnLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.sgcdeveloper.runwork.R
+import com.sgcdeveloper.runwork.presentation.component.ActionButtonBlock
 import com.sgcdeveloper.runwork.presentation.component.FullscreenImage
 import com.sgcdeveloper.runwork.presentation.component.InputField
 import com.sgcdeveloper.runwork.presentation.component.PasswordInputField
 import com.sgcdeveloper.runwork.presentation.component.chip.ui.HorizontalOneLineChipComponent
-import com.sgcdeveloper.runwork.presentation.screen.destinations.GetStartedScreenDestination
-import com.sgcdeveloper.runwork.presentation.theme.dark_blue
-import com.sgcdeveloper.runwork.presentation.theme.dark_gray
-import com.sgcdeveloper.runwork.presentation.theme.white
+import com.sgcdeveloper.runwork.presentation.theme.*
 import com.sgcdeveloper.runwork.presentation.util.navigableHiltViewModel
-import com.sgcdeveloper.runwork.presentation.util.shoErrorToast
-import com.sgcdeveloper.runwork.presentation.util.showSuccessToast
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -50,7 +40,7 @@ fun RegistrationEmailScreen(registrationEmailViewModel: RegistrationEmailViewMod
 
     val screenState = registrationEmailViewModel.registrationEmailScreenState.collectAsState().value
 
-    FullscreenImage(gradientColors = listOf(dark_gray.copy(0.5f), dark_gray.copy(0.5f)))
+    FullscreenImage(gradientColors = listOf(dark_gray.copy(0.5f), dark_gray.copy(0.1f), Color.Transparent))
 
     Column(Modifier.padding(start = 6.dp, end = 6.dp, top = 16.dp)) {
         Row(Modifier.fillMaxWidth()) {
@@ -94,7 +84,7 @@ fun RegistrationEmailScreen(registrationEmailViewModel: RegistrationEmailViewMod
         HorizontalOneLineChipComponent(
             chips = screenState.genderChips,
             defaultColor = white,
-            activeChipColor = dark_blue
+            activeChipColor = light_blue
         ) { registrationEmailViewModel.onEvent(RegistrationEvent.UpdateGender(it)) }
         InputField(
             label = stringResource(id = R.string.onboarding__email_registration),
@@ -135,5 +125,12 @@ fun RegistrationEmailScreen(registrationEmailViewModel: RegistrationEmailViewMod
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() })
         )
+        Spacer(modifier = Modifier.weight(1f))
+        ActionButtonBlock(
+            modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 16.dp),
+            actionTest = stringResource(id = R.string.onboarding__registration_action_button)
+        ) {
+            registrationEmailViewModel.onEvent(RegistrationEvent.Next)
+        }
     }
 }
