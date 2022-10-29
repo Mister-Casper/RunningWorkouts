@@ -1,5 +1,6 @@
 package com.sgcdeveloper.runwork.presentation.screen.onboarding.registrationEmail
 
+import android.net.Uri
 import com.google.firebase.auth.FirebaseAuth
 import com.sgcdeveloper.runwork.R
 import com.sgcdeveloper.runwork.data.model.user.UserGender
@@ -17,7 +18,6 @@ import com.sgcdeveloper.runwork.presentation.navigation.NavigationEventsHandler
 import com.sgcdeveloper.runwork.presentation.screen.destinations.GetStartedScreenDestination
 import com.sgcdeveloper.runwork.presentation.util.TextContainer
 import com.sgcdeveloper.runwork.presentation.util.TextContainer.Companion.getTextContainer
-import com.sgcdeveloper.runwork.presentation.util.TextContainer.Companion.toTextContainer
 import com.sgcdeveloper.runwork.presentation.util.getAuthErrorInfo
 import com.sgcdeveloper.runwork.presentation.util.userGenderChips
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -68,7 +68,17 @@ class RegistrationEmailViewModel @Inject constructor(
             is RegistrationEvent.UpdatePasswordVisibility -> {
                 updatePasswordVisibility(event.isVisible)
             }
+            is RegistrationEvent.UpdateProfilePic -> {
+                updateProfilePic(event.picUri)
+            }
+            RegistrationEvent.PermissionFailed -> {
+                sendEvent(NavigationEvent.ShowErrorMassage(getTextContainer(R.string.onboarding__registration_read_external_permission_failed)))
+            }
         }
+    }
+
+    private fun updateProfilePic(picUri: Uri) {
+        _registrationEmailScreenState.update { it.copy(userPicUri = picUri) }
     }
 
     private fun updatePasswordVisibility(newIsVisible: Boolean) {
@@ -76,7 +86,7 @@ class RegistrationEmailViewModel @Inject constructor(
     }
 
     private fun updateLastName(newLastName: String) {
-        _registrationEmailScreenState.update { it.copy(lastName = newLastName, firstNameError = null) }
+        _registrationEmailScreenState.update { it.copy(lastName = newLastName, lastNameError = null) }
     }
 
     private fun updateFirstName(newFirstName: String) {
@@ -117,16 +127,16 @@ class RegistrationEmailViewModel @Inject constructor(
                     _registrationEmailScreenState.update { it.copy(firstNameError = getTextContainer(R.string.onboarding__registration_name_error)) }
                 }
                 !isLastNameValid -> {
-                    _registrationEmailScreenState.update { it.copy(firstNameError = getTextContainer(R.string.onboarding__registration_name_error)) }
+                    _registrationEmailScreenState.update { it.copy(lastNameError = getTextContainer(R.string.onboarding__registration_name_error)) }
                 }
                 !isEmailValid -> {
-                    _registrationEmailScreenState.update { it.copy(firstNameError = getTextContainer(R.string.onboarding__login_email_error)) }
+                    _registrationEmailScreenState.update { it.copy(emailError = getTextContainer(R.string.onboarding__login_email_error)) }
                 }
                 !isPasswordValid -> {
-                    _registrationEmailScreenState.update { it.copy(firstNameError = getTextContainer(R.string.onboarding__login_password_error)) }
+                    _registrationEmailScreenState.update { it.copy(passwordError = getTextContainer(R.string.onboarding__login_password_error)) }
                 }
                 !isConfirmPasswordError -> {
-                    _registrationEmailScreenState.update { it.copy(firstNameError = getTextContainer(R.string.onboarding__registration_confirm_password_error)) }
+                    _registrationEmailScreenState.update { it.copy(confirmPasswordError = getTextContainer(R.string.onboarding__registration_confirm_password_error)) }
                 }
                 else -> {
                     return true
@@ -160,7 +170,7 @@ class RegistrationEmailViewModel @Inject constructor(
                     firstName = firstName,
                     lastName = lastName,
                     email = email,
-                    profilePic = userIconPath,
+                    profilePic = userPicUri,
                     gender = getSelectedGender(),
                 )
             )
@@ -172,7 +182,7 @@ class RegistrationEmailViewModel @Inject constructor(
     }
 
     data class LogInScreenState(
-        val userIconPath: String = "",
+        val userPicUri: Uri = Uri.EMPTY,
         val email: String = "",
         val emailError: TextContainer? = null,
         val password: String = "",

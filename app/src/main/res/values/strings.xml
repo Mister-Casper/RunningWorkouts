@@ -32,5 +32,6 @@
     <string name="onboarding__registration_action_button">JOIN</string>
     <string name="onboarding__registration_name_error">This field can\'t be empty</string>
     <string name="onboarding__registration_confirm_password_error">"Passwords do not match "</string>
+    <string name="onboarding__registration_read_external_permission_failed">You need read permission to get the image</string>
 
 </resources>
