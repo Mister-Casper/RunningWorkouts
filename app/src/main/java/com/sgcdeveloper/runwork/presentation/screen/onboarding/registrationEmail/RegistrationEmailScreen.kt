@@ -9,7 +9,14 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -23,7 +30,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
@@ -39,15 +45,17 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import coil.compose.rememberAsyncImagePainter
 import com.ramcosta.composedestinations.annotation.Destination
+import com.sgcdeveloper.chips.ui.ChipDefaults
+import com.sgcdeveloper.chips.ui.TextChipsRow
 import com.sgcdeveloper.runwork.R
 import com.sgcdeveloper.runwork.presentation.component.ActionButtonBlock
 import com.sgcdeveloper.runwork.presentation.component.FullscreenImage
 import com.sgcdeveloper.runwork.presentation.component.InputField
 import com.sgcdeveloper.runwork.presentation.component.PasswordInputField
-import com.sgcdeveloper.runwork.presentation.component.chip.ui.HorizontalOneLineChipComponent
-import com.sgcdeveloper.runwork.presentation.theme.*
+import com.sgcdeveloper.runwork.presentation.theme.dark_gray
+import com.sgcdeveloper.runwork.presentation.theme.light_blue
+import com.sgcdeveloper.runwork.presentation.theme.white
 import com.sgcdeveloper.runwork.presentation.util.navigableHiltViewModel
-
 
 private val PickVisualImageOnlyRequest = PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
 
@@ -167,11 +175,20 @@ fun RegistrationEmailScreen(registrationEmailViewModel: RegistrationEmailViewMod
                 )
             }
         }
-        HorizontalOneLineChipComponent(
-            chips = screenState.genderChips,
-            defaultColor = white,
-            activeChipColor = light_blue
-        ) { registrationEmailViewModel.onEvent(RegistrationEvent.UpdateGender(it)) }
+        TextChipsRow(
+            textChips = screenState.genderChips,
+            colors = ChipDefaults.chipColors(
+                backgroundColor = light_blue.copy(alpha = 0.2f),
+                contentColor = light_blue,
+                disabledBackgroundColor = white.copy(alpha = 0.2f),
+                disabledContentColor = white,
+                borderColor = light_blue,
+                disabledBorderColor = white
+            ),
+            onClick = { registrationEmailViewModel.onEvent(RegistrationEvent.UpdateGender(it)) },
+            contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp),
+            chipPadding = PaddingValues(all = 8.dp)
+        )
         InputField(
             label = stringResource(id = R.string.onboarding__email_registration),
             value = screenState.email,

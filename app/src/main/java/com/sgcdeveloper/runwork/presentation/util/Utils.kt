@@ -1,29 +1,27 @@
 package com.sgcdeveloper.runwork.presentation.util
 
+import com.sgcdeveloper.chips.model.ResText
 import com.sgcdeveloper.runwork.R
 import com.sgcdeveloper.runwork.data.model.user.UserGender
-import com.sgcdeveloper.runwork.presentation.component.chip.model.ChipModel
+import com.sgcdeveloper.runwork.presentation.model.GenderChipModel
 
 val userGenderChips by
 lazy {
     listOf(
-        ChipModel(
-            "1",
-            TextContainer.ResContainer(R.string.onboarding__registration_gender_male),
-            true,
-            UserGender.MALE
+        GenderChipModel(
+            text = ResText(R.string.onboarding__registration_gender_male),
+            isEnable = true,
+            gender = UserGender.MALE
         ),
-        ChipModel(
-            "2",
-            TextContainer.ResContainer(R.string.onboarding__registration_gender_female),
-            false,
-            UserGender.FEMALE
+        GenderChipModel(
+            text = ResText(R.string.onboarding__registration_gender_female),
+            isEnable = false,
+            gender = UserGender.FEMALE
         ),
-        ChipModel(
-            "3",
-            TextContainer.ResContainer(R.string.onboarding__registration_gender_not_said),
-            false,
-            UserGender.NOT_SAID
+        GenderChipModel(
+            text = ResText(R.string.onboarding__registration_gender_not_said),
+            isEnable = false,
+            gender = UserGender.NOT_SAID
         ),
     )
 }

@@ -2,6 +2,7 @@ package com.sgcdeveloper.runwork.presentation.screen.onboarding.registrationEmai
 
 import android.net.Uri
 import com.google.firebase.auth.FirebaseAuth
+import com.sgcdeveloper.chips.controller.ChipsController
 import com.sgcdeveloper.runwork.R
 import com.sgcdeveloper.runwork.data.model.user.UserGender
 import com.sgcdeveloper.runwork.data.model.user.UserInfo
@@ -10,8 +11,7 @@ import com.sgcdeveloper.runwork.domain.validators.ConfirmPasswordValidator
 import com.sgcdeveloper.runwork.domain.validators.EmailValidator
 import com.sgcdeveloper.runwork.domain.validators.PasswordValidator
 import com.sgcdeveloper.runwork.domain.validators.UserNameValidator
-import com.sgcdeveloper.runwork.presentation.component.chip.controller.OneActiveItemChipsController
-import com.sgcdeveloper.runwork.presentation.component.chip.model.ChipModel
+import com.sgcdeveloper.runwork.presentation.model.GenderChipModel
 import com.sgcdeveloper.runwork.presentation.navigation.NavigableViewModel
 import com.sgcdeveloper.runwork.presentation.navigation.NavigationEvent
 import com.sgcdeveloper.runwork.presentation.navigation.NavigationEventsHandler
@@ -21,7 +21,9 @@ import com.sgcdeveloper.runwork.presentation.util.TextContainer.Companion.getTex
 import com.sgcdeveloper.runwork.presentation.util.getAuthErrorInfo
 import com.sgcdeveloper.runwork.presentation.util.userGenderChips
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @HiltViewModel
@@ -38,7 +40,11 @@ class RegistrationEmailViewModel @Inject constructor(
     private val _registrationEmailScreenState = MutableStateFlow(LogInScreenState())
     val registrationEmailScreenState = _registrationEmailScreenState.asStateFlow()
 
-    private val genderChipsController = OneActiveItemChipsController(_registrationEmailScreenState.value.genderChips)
+    private val genderChipsController = ChipsController(userGenderChips)
+
+    init {
+        _registrationEmailScreenState.update { it.copy(genderChips = genderChipsController.getAllChips()) }
+    }
 
     fun onEvent(event: RegistrationEvent) {
         when (event) {
@@ -110,7 +116,7 @@ class RegistrationEmailViewModel @Inject constructor(
         }
     }
 
-    private fun updateSex(genderChip: ChipModel) {
+    private fun updateSex(genderChip: GenderChipModel) {
         genderChipsController.onChipClick(genderChip)
         _registrationEmailScreenState.update { it.copy(genderChips = genderChipsController.getAllChips()) }
     }
@@ -178,7 +184,7 @@ class RegistrationEmailViewModel @Inject constructor(
     }
 
     private fun getSelectedGender(): UserGender {
-        return genderChipsController.getActiveChipOrNull()?.data as? UserGender ?: UserGender.NOT_SAID
+        return genderChipsController.getFirstEnableChipOrNull()?.gender ?: UserGender.NOT_SAID
     }
 
     data class LogInScreenState(
@@ -194,6 +200,6 @@ class RegistrationEmailViewModel @Inject constructor(
         val firstNameError: TextContainer? = null,
         val lastName: String = "",
         val lastNameError: TextContainer? = null,
-        val genderChips: List<ChipModel> = userGenderChips
+        val genderChips: List<GenderChipModel> = emptyList()
     )
 }
