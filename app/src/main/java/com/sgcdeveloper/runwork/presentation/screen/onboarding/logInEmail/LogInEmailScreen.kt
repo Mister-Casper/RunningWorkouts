@@ -38,7 +38,7 @@ import com.sgcdeveloper.runwork.presentation.util.*
 @Destination
 fun LogInEmailScreen(
     navigator: DestinationsNavigator,
-    logInEmailViewModel: LogInEmailViewModel = navigableHiltViewModel()
+    logInEmailViewModel: LogInEmailViewModel = navigableHiltViewModel(navigator)
 ) {
     logInEmailViewModel.setNavigator(navigator)
 

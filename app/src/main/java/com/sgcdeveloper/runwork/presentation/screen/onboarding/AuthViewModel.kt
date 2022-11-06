@@ -1,28 +1,28 @@
 package com.sgcdeveloper.runwork.presentation.screen.onboarding
 
-import androidx.lifecycle.ViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.sgcdeveloper.runwork.data.model.core.OnboardingStatus
 import com.sgcdeveloper.runwork.domain.repository.AppRepository
-import com.sgcdeveloper.runwork.presentation.util.TextContainer
+import com.sgcdeveloper.runwork.presentation.navigation.NavigableViewModel
+import com.sgcdeveloper.runwork.presentation.navigation.NavigationEvent
+import com.sgcdeveloper.runwork.presentation.navigation.NavigationEventsHandler
+import com.sgcdeveloper.runwork.presentation.screen.destinations.GetStartedScreenDestination
+import com.sgcdeveloper.runwork.presentation.screen.destinations.LogInEmailScreenDestination
+import com.sgcdeveloper.runwork.presentation.screen.destinations.MainScreenDestination
+import com.sgcdeveloper.runwork.presentation.screen.destinations.RegistrationEmailScreenDestination
 import com.sgcdeveloper.runwork.presentation.util.getAuthErrorInfo
-import com.sgcdeveloper.runwork.presentation.util.sendEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
-    private val appRepository: AppRepository
-) : ViewModel() {
-
-    private val eventChannel = Channel<Event>()
-    val eventFlow = eventChannel.receiveAsFlow()
+    private val appRepository: AppRepository,
+    navigationEventsHandler: NavigationEventsHandler
+) : NavigableViewModel(navigationEventsHandler) {
 
     fun onEvent(event: AuthEvent) {
         when (event) {
@@ -35,15 +35,15 @@ class AuthViewModel @Inject constructor(
     }
 
     private fun logInByGoogleFailed(error: Throwable) {
-        sendEvent(eventChannel, Event.GoogleAuthFailed(error.getAuthErrorInfo()))
+        sendEvent(NavigationEvent.ShowErrorMassage(error.getAuthErrorInfo()))
     }
 
     private fun goLogInByEmail() {
-        sendEvent(eventChannel, Event.GoLogInByEmail)
+        sendEvent(NavigationEvent.NavigateTo(LogInEmailScreenDestination))
     }
 
     private fun goRegisterByEmail() {
-        sendEvent(eventChannel, Event.GoRegistrationByEmail)
+        sendEvent(NavigationEvent.NavigateTo(RegistrationEmailScreenDestination))
     }
 
     private fun tryLogInByGoogle(account: GoogleSignInAccount) {
@@ -59,22 +59,14 @@ class AuthViewModel @Inject constructor(
     private fun logInByGoogle(authResult: AuthResult) {
         if (authResult.additionalUserInfo?.isNewUser == false) {
             appRepository.setOnboardingStatus(OnboardingStatus.FINISH)
-            sendEvent(eventChannel, Event.GoogleAuthSuccess)
+            sendEvent(NavigationEvent.NavigateTo(MainScreenDestination))
         } else {
             appRepository.setOnboardingStatus(OnboardingStatus.GET_STARTED)
-            sendEvent(eventChannel, Event.GoGetStarted)
+            sendEvent(NavigationEvent.NavigateTo(GetStartedScreenDestination))
         }
     }
 
     private fun signOut() {
         firebaseAuth.signOut()
-    }
-
-    sealed class Event {
-        object GoogleAuthSuccess : Event()
-        data class GoogleAuthFailed(val errorInfo: TextContainer) : Event()
-        object GoLogInByEmail : Event()
-        object GoRegistrationByEmail : Event()
-        object GoGetStarted : Event()
     }
 }

@@ -10,13 +10,13 @@ import com.sgcdeveloper.runwork.presentation.util.showSuccessToast
 abstract class NavigationEvent {
     abstract fun execute(context: Context, navigator: DestinationsNavigator)
 
-    open class ShowErrorMassage(private val messageText: TextContainer) : NavigationEvent() {
+    class ShowErrorMassage(private val messageText: TextContainer) : NavigationEvent() {
         override fun execute(context: Context, navigator: DestinationsNavigator) {
             context.shoErrorToast(messageText)
         }
     }
 
-    open class ShowInfoMassage(private val messageText: TextContainer) : NavigationEvent() {
+    class ShowInfoMassage(private val messageText: TextContainer) : NavigationEvent() {
         override fun execute(context: Context, navigator: DestinationsNavigator) {
             context.showSuccessToast(messageText)
         }

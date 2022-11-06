@@ -13,9 +13,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.tasks.Task
-import com.ramcosta.composedestinations.navigation.DestinationsNavController
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import com.ramcosta.composedestinations.rememberNavHostEngine
 import com.sgcdeveloper.runwork.presentation.navigation.NavigableViewModel
 import es.dmoral.toasty.Toasty
 import kotlinx.coroutines.channels.Channel
@@ -56,13 +54,14 @@ fun <T> Task<T>.observe(onSuccess: (result: T) -> Unit, onFailure: (exception: E
 
 @Composable
 inline fun <reified VM : NavigableViewModel> navigableHiltViewModel(
+    destinationsNavigator: DestinationsNavigator,
     viewModelStoreOwner: ViewModelStoreOwner = checkNotNull(LocalViewModelStoreOwner.current) {
         "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
     }
 ): VM {
     val factory = createHiltViewModelFactory(viewModelStoreOwner)
     val viewModel = viewModel(viewModelStoreOwner, factory = factory) as VM
-    viewModel.setNavigator(DestinationsNavController(rememberNavController(), viewModelStoreOwner as NavBackStackEntry))
+    viewModel.setNavigator(destinationsNavigator)
     return viewModel(viewModelStoreOwner, factory = factory)
 }
 

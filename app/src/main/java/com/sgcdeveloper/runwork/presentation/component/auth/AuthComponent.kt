@@ -31,33 +31,6 @@ fun AuthComponent(
     emailAction: () -> Unit,
     authViewModel: AuthViewModel
 ) {
-    val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
-
-    LaunchedEffect(Unit) {
-        lifecycleOwner.lifecycleScope.launchWhenStarted {
-            authViewModel.eventFlow.collectLatest { event ->
-                when (event) {
-                    is AuthViewModel.Event.GoogleAuthSuccess -> {
-                        navigator.navigate(GetStartedScreenDestination)
-                    }
-                    AuthViewModel.Event.GoLogInByEmail -> {
-                        navigator.navigate(LogInEmailScreenDestination)
-                    }
-                    is AuthViewModel.Event.GoogleAuthFailed -> {
-                        context.shoErrorToast(event.errorInfo)
-                    }
-                    AuthViewModel.Event.GoGetStarted -> {
-                        navigator.navigate(GetStartedScreenDestination)
-                    }
-                    AuthViewModel.Event.GoRegistrationByEmail -> {
-                        navigator.navigate(RegistrationEmailScreenDestination)
-                    }
-                }
-            }
-        }
-    }
-
     AuthComponentContent(navigator, authViewModel, header, description, emailAction)
 }
 

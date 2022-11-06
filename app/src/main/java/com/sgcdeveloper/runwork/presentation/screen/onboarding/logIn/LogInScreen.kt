@@ -9,10 +9,11 @@ import com.sgcdeveloper.runwork.R
 import com.sgcdeveloper.runwork.presentation.component.auth.AuthComponent
 import com.sgcdeveloper.runwork.presentation.screen.onboarding.AuthEvent
 import com.sgcdeveloper.runwork.presentation.screen.onboarding.AuthViewModel
+import com.sgcdeveloper.runwork.presentation.util.navigableHiltViewModel
 
 @Composable
 @Destination
-fun LogInScreen(navigator: DestinationsNavigator, authViewModel: AuthViewModel = hiltViewModel()) {
+fun LogInScreen(navigator: DestinationsNavigator, authViewModel: AuthViewModel = navigableHiltViewModel(navigator)) {
     AuthComponent(
         navigator = navigator,
         header = stringResource(id = R.string.onboarding__login_header),

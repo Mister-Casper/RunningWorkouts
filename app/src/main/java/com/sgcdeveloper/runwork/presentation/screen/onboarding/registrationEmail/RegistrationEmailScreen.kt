@@ -42,9 +42,11 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import coil.compose.rememberAsyncImagePainter
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.sgcdeveloper.chips.ui.ChipDefaults
 import com.sgcdeveloper.chips.ui.TextChipsRow
 import com.sgcdeveloper.runwork.R
@@ -62,7 +64,10 @@ private val PickVisualImageOnlyRequest = PickVisualMediaRequest(ActivityResultCo
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 @Destination
-fun RegistrationEmailScreen(registrationEmailViewModel: RegistrationEmailViewModel = navigableHiltViewModel()) {
+fun RegistrationEmailScreen(
+    navigator: DestinationsNavigator,
+    registrationEmailViewModel: RegistrationEmailViewModel = navigableHiltViewModel(navigator)
+) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
@@ -186,8 +191,9 @@ fun RegistrationEmailScreen(registrationEmailViewModel: RegistrationEmailViewMod
                 disabledBorderColor = white
             ),
             onClick = { registrationEmailViewModel.onEvent(RegistrationEvent.UpdateGender(it)) },
-            contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp),
-            chipPadding = PaddingValues(all = 8.dp)
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
+            chipPadding = PaddingValues(all = 8.dp),
+            fontSize = 16.sp
         )
         InputField(
             label = stringResource(id = R.string.onboarding__email_registration),
